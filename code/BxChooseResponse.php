@@ -66,7 +66,7 @@ class BxChooseResponse
 		return $this->getSearchResultHitIds($this->getVariantSearchResult($variant, $considerRelaxation));
     }
 	
-	public function getSearchHitFieldValues($searchResult) {
+	public function getSearchHitFieldValues($searchResult, $fields) {
 		$fieldValues = array();
 		foreach ($searchResult->hits as $item) {
 			foreach ($fields as $field) {
@@ -88,9 +88,9 @@ class BxChooseResponse
 		return $this->facets;
     }
 
-    public function getHitFieldValues($choice, $considerRelaxation=true) {
+    public function getHitFieldValues($fields, $choice=null, $considerRelaxation=true) {
 		$variant = $this->getChoiceResponseVariant($choice);
-		return $this->getSearchHitFieldValues($this->getVariantSearchResult($variant, $considerRelaxation));
+		return $this->getSearchHitFieldValues($this->getVariantSearchResult($variant, $considerRelaxation), $fields);
     }
 
     public function getTotalHitCount($choice=null, $considerRelaxation=true) {
