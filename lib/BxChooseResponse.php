@@ -3,12 +3,10 @@
 class BxChooseResponse 
 {
 	private $response;
-	private $bxRecommendations;
-	private $facets;
-	public function __construct($response, $bxRecommendations=array(), $facets = null) {
+	private $bxRequests;
+	public function __construct($response, $bxRequests=array()) {
 		$this->response = $response;
-		$this->bxRecommendations = $bxRecommendations;
-		$this->facets = $facets;
+		$this->bxRequests = $bxRequests;
 	}
 	
 	public function getResponse() {
@@ -17,8 +15,8 @@ class BxChooseResponse
 	
 	public function getChoiceResponseVariant($choice=null) {
         $id = 0;
-		foreach($this->bxRecommendations as $k => $bxRecommendation) {
-			if($choice != null && $choice == $bxRecommendation->getChoiceId()) {
+		foreach($this->bxRequests as $k => $bxRequest) {
+			if($choice != null && $choice == $bxRequest->getChoiceId()) {
 				$id = $k;
 			}
 		}
@@ -75,17 +73,35 @@ class BxChooseResponse
 						$fieldValues[$item->values['id'][0]][$field] = $item->values[$field];
 					}
 				}
+				if(!isset($fieldValues[$item->values['id'][0]][$field])) {
+					$fieldValues[$item->values['id'][0]][$field] = array();
+				}
 			}
 		}
 		return $fieldValues;
+	}
+	
+	protected function getRequestFacets($choice=null) {
+		if($choice == null) {
+			if(isset($this->bxRequests[0])) {
+				return $this->bxRequests[0]->getFacets();
+			}
+			return null;
+		}
+		foreach($this->bxRequests as $bxRequest) {
+			if($bxRequest->getChoiceId() == $choice) {
+				return $bxRequest->getFacets();
+			}
+		}
+		return null;
 	}
 
     public function getFacets($choice=null, $considerRelaxation=true) {
 		$variant = $this->getChoiceResponseVariant($choice);
 		$searchResult = $this->getVariantSearchResult($variant, $considerRelaxation);
-		$facets = $searchResult->facetResponses;
-		$this->facets->setFacetResponse($variant->searchResult->facetResponses);
-		return $this->facets;
+		$facets = $this->getRequestFacets($choice);
+		$facets->setFacetResponse($variant->searchResult->facetResponses);
+		return $facets;
     }
 
     public function getHitFieldValues($fields, $choice=null, $considerRelaxation=true) {

@@ -13,19 +13,15 @@ class BxClient
 	private $p13n_password;
 	private $domain;
 	private $language;
-	private $additionalFields;
-	private $p13n;
-	private $facets;
 	
-	private $filters = array();
 	private $autocompleteResponse = null;
-	private $searchResponse = null;
-	private $recommendationsResponse = null;
 	
+	private $chooseRequests = array();
+	private $chooseResponses = null;
 	
     const VISITOR_COOKIE_TIME = 31536000;
 
-	public function __construct($account, $password, $domain, $language=null, $isDev=false, $host=null, $port=null, $uri=null, $schema=null, $p13n_username=null, $p13n_password=null, $additionalFields=array()) {
+	public function __construct($account, $password, $domain, $language=null, $isDev=false, $host=null, $port=null, $uri=null, $schema=null, $p13n_username=null, $p13n_password=null) {
 		$this->account = $account;
 		$this->password = $password;
 		$this->isDev = $isDev;
@@ -55,12 +51,9 @@ class BxClient
 		}
 		$this->domain = $domain;
 		$this->language = $language;
-		$this->additionalFields = $additionalFields;
-		
-		$this->facets = new \BxFacets();
 	}
 	
-	public static function LOAD_CLASSES($codePath, $libPath) {
+	public static function LOAD_CLASSES($libPath) {
 		
 		require_once($libPath . '/Thrift/ClassLoader/ThriftClassLoader.php');		
 		$cl = new \Thrift\ClassLoader\ThriftClassLoader(false);
@@ -69,109 +62,14 @@ class BxClient
 		require_once($libPath . '/P13nService.php');
 		require_once($libPath . '/Types.php');
 
-		require_once($codePath . "/BxFacets.php");
-		require_once($codePath . "/BxFilter.php");
-		require_once($codePath . "/BxRecommendation.php");
-		require_once($codePath . "/BxSortFields.php");
-		require_once($codePath . "/BxChooseResponse.php");
+		require_once($libPath . "/BxFacets.php");
+		require_once($libPath . "/BxFilter.php");
+		require_once($libPath . "/BxRequest.php");
+		require_once($libPath . "/BxRecommendationRequest.php");
+		require_once($libPath . "/BxSearchRequest.php");
+		require_once($libPath . "/BxSortFields.php");
+		require_once($libPath . "/BxChooseResponse.php");
 	}
-
-    /**
-     * @param string $field field name for filter
-     * @param int $hierarchyId names of categories in hierarchy
-     * @param int $hierarchy names of categories in hierarchy
-     * @param string|null $lang
-     *
-     */
-    public function addFilterHierarchy($field, $hierarchyId, $hierarchy, $localized = false)
-    {
-        $filter = new \com\boxalino\p13n\api\thrift\Filter();
-
-        if ($localized) {
-            $filter->fieldName = $field . '_' . $this->language;
-        } else {
-            $filter->fieldName = $field;
-        }
-        
-        $filter->hierarchyId = $hierarchyId;
-        $filter->hierarchy = $hierarchy;
-
-        $this->filters[] = $filter;
-    }
-
-    /**
-     * @param string $field field name for filter
-     * @param mixed $value filter value
-     * @param string|null $lang
-     *
-     */
-    public function addFilter($field, $value, $localized = false, $prefix = 'products_', $bodyName = 'description')
-    {
-        $filter = new \com\boxalino\p13n\api\thrift\Filter();
-		
-		if ($field == $bodyName) {
-			$field = 'body';
-		} else {
-			$field = $prefix . $field;
-		}
-		
-        if ($localized) {
-            $filter->fieldName = $field . '_' . $this->language;
-        } else {
-            $filter->fieldName = $field;
-        }
-
-        if (is_array($value)) {
-            $filter->stringValues = $value;
-        } else {
-            $filter->stringValues = array($value);
-        }
-
-        $this->filters[] = $filter;
-    }
-	
-	public function addBxFilter($bxFilter) {
-        $this->filters[] = $bxFilter->getThriftFilter();
-	}
-	
-    public function addFilterCategory($categoryId, $categoryName)
-    {
-		$filter = new \com\boxalino\p13n\api\thrift\Filter();
-
-		$filter->fieldName = 'categories';
-
-		$filter->hierarchyId = $categoryId;
-		$filter->hierarchy = array($categoryName);
-
-		$this->filters[] = $filter;
-    }
-
-    /**
-     * @param string $field field name for filter
-     * @param number $from param from
-     * @param number $to param from
-     * @param string|null $lang
-     *
-     */
-    public function addFilterFromTo($field, $from, $to, $localized = false)
-    {
-        $filter = new \com\boxalino\p13n\api\thrift\Filter();
-
-		if ($field == 'price') {
-			$field = 'discountedPrice';
-		}
-
-        if ($localized) {
-            $filter->fieldName = $field . '_' . $this->language;
-        } else {
-            $filter->fieldName = $field;
-        }
-
-        $filter->rangeFrom = $from;
-        $filter->rangeTo = $to;
-
-        $this->filters[] = $filter;
-    }
 	
 	public function getAccount() {
 		if($this->isDev) {
@@ -254,25 +152,6 @@ class BxClient
 
         return $choiceRequest;
 	}
-
-	private function getSimpleSearchQuery($returnFields, $hitCount, $queryText, $bxFacets = array(), $bxSortFields = null, $offset = 0) {
-		$searchQuery = new \com\boxalino\p13n\api\thrift\SimpleSearchQuery();
-		$searchQuery->indexId = $this->getAccount();
-		$searchQuery->language = $this->language;
-		$searchQuery->returnFields = $returnFields;
-		$searchQuery->offset = $offset;
-		$searchQuery->hitCount = $hitCount;
-		$searchQuery->queryText = $queryText;
-		if($bxFacets) {
-			$searchQuery->facetRequests = $bxFacets->getThriftFacets();
-		}
-
-		if($bxSortFields) {
-			$searchQuery->sortFields = $bxSortFields->getThriftSortFields();
-		}
-
-		return $searchQuery;
-	}
 	
 	protected function getIP()
     {
@@ -346,81 +225,38 @@ class BxClient
 		}
 	}
 	
-	public function setBxFacets($facets) {
-		$this->facets = $facets;
+	public function addRequest($request) {
+		$this->chooseRequests[] = $request;
 	}
 	
-	public function getBxFacets() {
-		return $this->facets;
+	public function resetRequests() {
+		$this->chooseRequests = array();
 	}
 	
-	/**
-	* RECOMMENDATIONS METHODS
-	*/
-	
-	protected function recommend($bxRecommendations, $returnFields = array(), $bxFacets = null, $bxSortFields=null, $queryText=null) {
+	protected function choose() {
 		
 		$choiceInquiries = array();
 		
-		$requestContext = $this->getRequestContext();
-
-		$contextItems = array();
-		
-		foreach($bxRecommendations as $bxRecommendation) {
-			$searchQuery = $this->getSimpleSearchQuery($returnFields, $bxRecommendation->getMax(), $queryText, $bxFacets, $bxSortFields);
+		foreach($this->chooseRequests as $request) {
 			
 			$choiceInquiry = new \com\boxalino\p13n\api\thrift\ChoiceInquiry();
-			$choiceInquiry->choiceId = $bxRecommendation->getChoiceId();
-			$choiceInquiry->simpleSearchQuery = $searchQuery;
-			$choiceInquiry->contextItems = $contextItems;
-			$choiceInquiry->minHitCount = $bxRecommendation->getMin();
+			$choiceInquiry->choiceId = $request->getChoiceId();
+			$choiceInquiry->simpleSearchQuery = $request->getSimpleSearchQuery();
+			$choiceInquiry->contextItems = $request->getContextItems();
+			$choiceInquiry->minHitCount = $request->getMin();
 			
 			$choiceInquiries[] = $choiceInquiry;
 		}
 
-		$choiceRequest = $this->getChoiceRequest($choiceInquiries, $requestContext);
-		$this->recommendationsResponse = $this->p13nchoose($choiceRequest);
+		$choiceRequest = $this->getChoiceRequest($choiceInquiries, $this->getRequestContext());
+		$this->chooseResponses = $this->p13nchoose($choiceRequest);
 	}
 	
-	public function getCurrentRecommendationsResponse($bxRecommendations, $returnFields) {
-		if(!$this->recommendationsResponse) {
-			$this->recommend($bxRecommendations, $returnFields);
+	public function getResponse() {
+		if(!$this->chooseResponses) {
+			$this->choose();
 		}
-		return new \BxChooseResponse($this->recommendationsResponse, $bxRecommendations);
-	}
-	
-	/**
-	* SERCH METHODS
-	*/
-
-	public function search($queryText, $language = null, $hitCount = 10, $returnFields = array(), $searchChoice = 'search', $bxFacets = null, $offset = 0, $bxSortFields=null, $withRelaxation = true) {
-		
-		if($language != null) {
-			$this->language = $language;
-		}
-
-		$simpleSearchQuery = $this->getSimpleSearchQuery($returnFields, $hitCount, $queryText, $bxFacets, $bxSortFields, $offset);
-
-		$choiceInquiry = new \com\boxalino\p13n\api\thrift\ChoiceInquiry();
-		$choiceInquiry->choiceId = $searchChoice;
-        $choiceInquiry->simpleSearchQuery = $simpleSearchQuery;
-        $choiceInquiry->withRelaxation = $withRelaxation;
-		
-		$choiceRequest = $this->getChoiceRequest(array($choiceInquiry));
-
-		if(isset($_REQUEST['show_search_request']) && $_REQUEST['show_search_request'] == 'true') {
-			print_r($choiceRequest);
-			exit;
-		}
-		$this->searchResponse = $this->p13nchoose($choiceRequest);
-	}
-	
-	public function isSearchDone() {
-		return $this->searchResponse != null;
-	}
-	
-	public function getCurrentSearchResponse() {
-		return new \BxChooseResponse($this->searchResponse);
+		return new \BxChooseResponse($this->chooseResponses, $this->chooseRequests);
 	}
 	
 	/**
@@ -447,18 +283,16 @@ class BxClient
 		return $autocompleteQuery;
 	}
 	
-    public function autocomplete($queryText, $suggestionsHitCount, $hitCount = 0, $returnFields = array(), $autocompleteChoice = 'autocomplete', $searchChoice = 'search')
+    public function autocomplete($bxRecommendation, $suggestionsHitCount, $autocompleteChoice = 'autocomplete')
     {
-        $searchQuery = $this->getSimpleSearchQuery($returnFields, $hitCount, $queryText);
-		
-		list($sessionid, $profileid) = $this->getSessionAndProfile();
+        list($sessionid, $profileid) = $this->getSessionAndProfile();
         
 		$autocompleteRequest = new \com\boxalino\p13n\api\thrift\AutocompleteRequest();
 		$autocompleteRequest->userRecord = $this->getUserRecord();
 		$autocompleteRequest->profileId = $profileid;
 		$autocompleteRequest->choiceId = $autocompleteChoice;
-        $autocompleteRequest->searchQuery = $searchQuery;
-        $autocompleteRequest->searchChoiceId = $searchChoice;
+        $autocompleteRequest->searchQuery = $bxRecommendation->getSimpleSearchQuery();
+        $autocompleteRequest->searchChoiceId = $bxRecommendation->getChoiceId();
 		$autocompleteRequest->autocompleteQuery = $this->getAutocompleteQuery($queryText, $suggestionsHitCount);
         
 		$this->autocompleteResponse = $this->p13nautocomplete($autocompleteRequest);

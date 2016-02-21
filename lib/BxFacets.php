@@ -2,21 +2,38 @@
 
 class BxFacets
 {
-	protected $facets = array();
-	protected $requestFacets = null;
+	public $facets = array();
 	protected $facetResponse = null;
-	protected $parameterPrefix = '';
 	
-	public function setRequestFacets($requestFacets) {
-		$this->requestFacets = $requestFacets;
-	}
+	protected $parameterPrefix = '';
 	
 	public function setFacetResponse($facetResponse) {
 		$this->facetResponse = $facetResponse;
 	}
+	
+	public function getCategoryFieldName() {
+		return "categories";
+	}
+	
+	private $filters = array();
+	
+	public function getFilters() {
+		return $this->filters;
+	}
+	
+	public function addCategoryFacet($selectedValue=null, $order=2) {
+		if($selectedValue) {
+			$this->addFacet('category_id', $selectedValue, 'hierarchical', '1');
+		}
+		$this->addFacet($this->getCategoryFieldName(), null, 'hierarchical', $order);
+	}
 
-	public function addFacet($fieldName, $label, $type, $direction=2) {
-		$this->facets[$fieldName] = array($label, $type, $direction);
+	public function addFacet($fieldName, $selectedValue=null, $type='string', $label=null, $order=2) {
+		$selectedValues = array();
+		if($selectedValue) {
+			$selectedValues[] = $selectedValue;
+		}
+		$this->facets[$fieldName] = array('label'=>$label, 'type'=>$type, 'order'=>$order, 'selectedValues'=>$selectedValues);
 	}
 	
 	public function setParameterPrefix($parameterPrefix) {
@@ -36,11 +53,7 @@ class BxFacets
     }
 
     public function getFieldNames() {
-        $fieldNames = array();
-        foreach($this->requestFacets as $facetResponse) {
-            $fieldNames[] = $facetResponse->fieldName;
-        }
-        return $fieldNames;
+        return array_keys($this->facets);
     }
 
     protected function getFacetResponse($fieldName) {
@@ -55,7 +68,7 @@ class BxFacets
 	protected function getFacetType($fieldName) {
 		$type = 'string';
 		if(isset($this->facets[$fieldName])) {
-			list($label, $type, $order) = $this->facets[$fieldName];
+			$type = $this->facets[$fieldName]['type'];
 		}
 		return $type;
 	}
@@ -109,20 +122,20 @@ class BxFacets
 	}
 	
 	public function getSelectedTreeNode($tree) {
-		if(isset($this->requestFacets['category_id'])) {
-			$parts = explode('/', $tree['node']->stringValue);
-			if($parts[0] == $this->requestFacets['category_id'][0]) {
-				return $tree;
-			}
-			foreach($tree['children'] as $node) {
-				$result = $this->getSelectedTreeNode($node);
-				if($result != null) {
-					return $result;
-				}
-			}
-			return null;
+		if(!isset($this->facets['category_id'])){
+			return $tree;
 		}
-		return $tree;
+		$parts = explode('/', $tree['node']->stringValue);
+		if($parts[0] == $this->facets['category_id']['selectedValues'][0]) {
+			return $tree;
+		}
+		foreach($tree['children'] as $node) {
+			$result = $this->getSelectedTreeNode($node);
+			if($result != null) {
+				return $result;
+			}
+		}
+		return null;
 	}
 	
 	protected function getFacetKeysValues($fieldName) {
@@ -196,9 +209,48 @@ class BxFacets
 				$tree = $this->getSelectedTreeNode($tree);
 				return $tree && sizeof($tree['node']->hierarchy)>1;
 			}
-			return isset($this->requestFacets[$fieldName]);
+			return isset($this->facets[$fieldName]['selectedValues']) && sizeof($this->facets[$fieldName]['selectedValues']) > 0;
 		}
 		return false;
+	}
+	
+	public function getTreeParent($tree, $treeEnd) {
+		foreach($tree['children'] as $child) {
+			if($child['node']->stringValue == $treeEnd['node']->stringValue) {
+				return $tree;
+			}
+			$parent = $this->getTreeParent($child, $treeEnd);
+			if($parent) {
+				return $parent;
+			}
+		}
+		return null;
+	}
+	
+	public function getParentCategories() {
+		$fieldName = 'categories';
+		$facetResponse = $this->getFacetResponse($fieldName);
+		$tree = $this->buildTree($facetResponse->values);
+		$treeEnd = $this->getSelectedTreeNode($tree);
+		if($treeEnd == null) {
+			return array();
+		}
+		if($treeEnd['node']->stringValue == $tree['node']->stringValue) {
+			return array();
+		}
+		$parents = array();
+		$parent = $treeEnd;
+		while($parent) {
+			$parts = explode('/', $parent['node']->stringValue);
+			$parents[] = array($parts[0], $parts[sizeof($parts)-1]);
+			$parent = $this->getTreeParent($tree, $parent);
+		}
+		krsort($parents);
+		$final = array();
+		foreach($parents as $v) {
+			$final[$v[0]] = $v[1];
+		}
+		return $final;
 	}
 	
 	public function getSelectedValueLabel($fieldName, $index=0) {
@@ -219,13 +271,17 @@ class BxFacets
 				return $parts[sizeof($parts)-1];
 			}
 			if($facet[1] == 'ranged') {
-				if(isset($this->requestFacets[$fieldName][0])) {
-					return $this->requestFacets[$fieldName][0];
+				if(isset($this->facets[$fieldName]['selectedValues'][0])) {
+					return $this->facets[$fieldName]['selectedValues'][0];
 				}
 			}
 			return $facet[2];
 		}
 		return "";
+	}
+	
+	public function getCategories() {
+		return $this->getFacetValues($this->getCategoryFieldName());
 	}
 
     public function getFacetValues($fieldName) {
@@ -264,15 +320,27 @@ class BxFacets
 		}
 	}
 	
+	public function getCategoryValueLabel($facetValue){
+		return $this->getFacetValueLabel($this->getCategoryFieldName(), $facetValue);
+	}
+	
 	public function getFacetValueLabel($fieldName, $facetValue) {
         list($label, $parameterValue, $hitCount, $selected) = $this->getFacetValueArray($fieldName, $facetValue);
 		return $label;
     }
+	
+	public function getCategoryValueCount($facetValue){
+		return $this->getFacetValueCount($this->getCategoryFieldName(), $facetValue);
+	}
 
     public function getFacetValueCount($fieldName, $facetValue) {
 		list($label, $parameterValue, $hitCount, $selected) = $this->getFacetValueArray($fieldName, $facetValue);
 		return $hitCount;
     }
+	
+	public function getCategoryValueId($facetValue) {
+		return $this->getFacetValueParameterValue($this->getCategoryFieldName(), $facetValue);
+	}
 
     public function getFacetValueParameterValue($fieldName, $facetValue) {
         list($label, $parameterValue, $hitCount, $selected) = $this->getFacetValueArray($fieldName, $facetValue);
@@ -289,7 +357,9 @@ class BxFacets
 		$thriftFacets = array();
 		
 		foreach($this->facets as $fieldName => $facet) {
-			list($label, $type, $order) = $facet;
+			$type = $facet['type'];
+			$order = $facet['order'];
+			
 			$facetRequest = new \com\boxalino\p13n\api\thrift\FacetRequest();
 			$facetRequest->fieldName = $fieldName;
 			$facetRequest->numerical = $type == 'ranged' ? true : $type == 'numerical' ? true : false;
@@ -302,11 +372,11 @@ class BxFacets
 		return $thriftFacets;
 	}
 
-    private function facetSelectedValue($name, $option)
+    private function facetSelectedValue($fieldName, $option)
     {
         $selectedFacets = array();
-		if (isset($this->requestFacets[$name])) {
-            foreach ($this->requestFacets[$name] as $value) {
+		if (isset($this->facets[$fieldName]['selectedValues'])) {
+            foreach ($this->facets[$fieldName]['selectedValues'] as $value) {
                 $selectedFacet = new \com\boxalino\p13n\api\thrift\FacetValue();
                 if ($option == 'ranged') {
                     $rangedValue = explode('-', $value);

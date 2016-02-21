@@ -1,7 +1,9 @@
 <?php
 
 /**
-* In this example, we make a simple search query, get the search results and print their ids
+* In this example, we make a simple search query, add a filter and get the search results and print their ids
+* Filters are different than facets because they are not returned to the user and should not be related to a user interaction
+* Filters should be "system" filters (e.g.: filter on a category within a category page, filter on product which are visible and not out of stock, etc.)
 */
 
 //include the Boxalino Client SDK php files
@@ -16,6 +18,9 @@ $domain = ""; // your web-site domain (e.g.: www.abc.com)
 $queryText = "women"; // a search query
 $language = "en"; // a valid language code (e.g.: "en", "fr", "de", "it", ...)
 $hitCount = 10; //a maximum number of search result to return in one page
+$filterField = "id"; //the field to consider in the filter
+$filterValues = array("41", "1940"); //the field to consider any of the values should match (or not match)
+$filterNegative = true; //false by default, should the filter match the values or not?
 
 //Create the Boxalino Client SDK instance
 //N.B.: you should not create several instances of BxClient on the same page, make sure to save it in a static variable and to re-use it.
@@ -24,6 +29,9 @@ $bxClient = new BxClient($account, $password, $domain);
 try {
 	//create search request
 	$bxRequest = new BxSearchRequest($account, $language, $queryText, $hitCount);
+	
+	//add a filter
+	$bxRequest->addFilter(new BxFilter($filterField, $filterValues, $filterNegative));
 	
 	//add the request
 	$bxClient->addRequest($bxRequest);

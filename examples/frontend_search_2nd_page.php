@@ -1,7 +1,7 @@
 <?php
 
 /**
-* In this example, we make a simple search query, get the search results and print their ids
+* In this example, we make a simple search query, get the second page of search results and print their ids
 */
 
 //include the Boxalino Client SDK php files
@@ -16,6 +16,7 @@ $domain = ""; // your web-site domain (e.g.: www.abc.com)
 $queryText = "women"; // a search query
 $language = "en"; // a valid language code (e.g.: "en", "fr", "de", "it", ...)
 $hitCount = 10; //a maximum number of search result to return in one page
+$offset = 10; //the offset to start the page with (if = hitcount ==> page 2)
 
 //Create the Boxalino Client SDK instance
 //N.B.: you should not create several instances of BxClient on the same page, make sure to save it in a static variable and to re-use it.
@@ -24,6 +25,9 @@ $bxClient = new BxClient($account, $password, $domain);
 try {
 	//create search request
 	$bxRequest = new BxSearchRequest($account, $language, $queryText, $hitCount);
+	
+	//set an offset for the returned search results (start at position provided)
+	$bxRequest->setOffset($offset);
 	
 	//add the request
 	$bxClient->addRequest($bxRequest);

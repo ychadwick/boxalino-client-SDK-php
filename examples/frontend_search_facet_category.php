@@ -1,7 +1,8 @@
 <?php
 
 /**
-* In this example, we make a simple search query, get the search results and print their ids
+* In this example, we make a simple search query, request a facet and get the search results and print the facet values and counter.
+* We also implement a simple link logic so that if the user clicks on one of the facet values the page is reloaded with the results with this facet value selected.
 */
 
 //include the Boxalino Client SDK php files
@@ -16,6 +17,7 @@ $domain = ""; // your web-site domain (e.g.: www.abc.com)
 $queryText = "women"; // a search query
 $language = "en"; // a valid language code (e.g.: "en", "fr", "de", "it", ...)
 $hitCount = 10; //a maximum number of search result to return in one page
+$selectedValue = isset($_REQUEST['bx_category_id']) ? $_REQUEST['bx_category_id'] : null;
 
 //Create the Boxalino Client SDK instance
 //N.B.: you should not create several instances of BxClient on the same page, make sure to save it in a static variable and to re-use it.
@@ -25,11 +27,34 @@ try {
 	//create search request
 	$bxRequest = new BxSearchRequest($account, $language, $queryText, $hitCount);
 	
+	//add a facert
+	$facets = new BxFacets();
+	$facets->addCategoryFacet($selectedValue);
+	$bxRequest->setFacets($facets);
+	
 	//add the request
 	$bxClient->addRequest($bxRequest);
 	
 	//retrieve the search response object
 	$bxResponse = $bxClient->getResponse();
+	
+	//get the facet responses
+	$facets = $bxResponse->getFacets();
+	
+	//show the category breadcrumbs
+	$level = 0;
+	echo "<a href=\"?\">home</a>";
+	foreach($facets->getParentCategories() as $categoryId => $categoryLabel) {
+		echo ">> <a href=\"?bx_category_id=$categoryId\">$categoryLabel</a>";
+		$level++;
+	}
+	echo "<br><br>";
+	
+	//show the category facet values
+	foreach($facets->getCategories() as $value) {
+		echo "<a href=\"?bx_category_id=" . $facets->getCategoryValueId($value) . "\">" . $facets->getCategoryValueLabel($value) . "</a> (" . $facets->getCategoryValueCount($value) . ")<br>";
+	}
+	echo "<br>";
 	
 	//loop on the search response hit ids and print them
 	foreach($bxResponse->getHitIds() as $i => $id) {

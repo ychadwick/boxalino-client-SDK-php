@@ -1,7 +1,8 @@
 <?php
 
 /**
-* In this example, we make a simple search query, defined additional fields to be returned for each reserult, get the search results and print their field values
+* In this example, we make a simple search query, request a facet and get the search results and print the facet values and counter.
+* We also implement a simple link logic so that if the user clicks on one of the facet values the page is reloaded with the results with this facet value selected.
 */
 
 //include the Boxalino Client SDK php files
@@ -16,7 +17,8 @@ $domain = ""; // your web-site domain (e.g.: www.abc.com)
 $queryText = "women"; // a search query
 $language = "en"; // a valid language code (e.g.: "en", "fr", "de", "it", ...)
 $hitCount = 10; //a maximum number of search result to return in one page
-$fieldNames = array("products_color");
+$facetField = "products_color"; //the field to consider in the filter
+$selectedValue = isset($_REQUEST['bx_' . $facetField]) ? $_REQUEST['bx_' . $facetField] : null;
 
 //Create the Boxalino Client SDK instance
 //N.B.: you should not create several instances of BxClient on the same page, make sure to save it in a static variable and to re-use it.
@@ -27,7 +29,12 @@ try {
 	$bxRequest = new BxSearchRequest($account, $language, $queryText, $hitCount);
 	
 	//set the fields to be returned for each item in the response
-	$bxRequest->setReturnFields($fieldNames);
+	$bxRequest->setReturnFields(array($facetField));
+	
+	//add a facert
+	$facets = new BxFacets();
+	$facets->addFacet($facetField, $selectedValue);
+	$bxRequest->setFacets($facets);
 	
 	//add the request
 	$bxClient->addRequest($bxRequest);
@@ -35,8 +42,20 @@ try {
 	//retrieve the search response object
 	$bxResponse = $bxClient->getResponse();
 	
+	//get the facet responses
+	$facets = $bxResponse->getFacets();
+	
 	//loop on the search response hit ids and print them
-	foreach($bxResponse->getHitFieldValues($fieldNames) as $id => $fieldValueMap) {
+	foreach($facets->getFacetValues($facetField) as $fieldValue) {
+		echo "<a href=\"?bx_" . $facetField . "=$fieldValue\">" . $facets->getFacetValueLabel($facetField, $fieldValue) . "</a> (" . $facets->getFacetValueCount($facetField, $fieldValue) . ")";
+		if($facets->isFacetValueSelected($facetField, $fieldValue)) {
+			echo "<a href=\"?\">[X]</a>";
+		}
+		echo "<br>";
+	}
+	
+	//loop on the search response hit ids and print them
+	foreach($bxResponse->getHitFieldValues(array($facetField)) as $id => $fieldValueMap) {
 		echo "<h3>$id</h3>";
 		foreach($fieldValueMap as $fieldName => $fieldValues) {
 			echo "$fieldName: " . implode(',', $fieldValues) . "<br>";
