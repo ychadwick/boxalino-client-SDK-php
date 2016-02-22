@@ -1,5 +1,7 @@
 <?php
 
+namespace com\boxalino\bxclient\v1;
+
 class BxFilter
 {
 	protected $fieldName;

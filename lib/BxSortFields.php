@@ -1,5 +1,7 @@
 <?php
 
+namespace com\boxalino\bxclient\v1;
+
 class BxSortFields
 {
 	private $sorts = array();

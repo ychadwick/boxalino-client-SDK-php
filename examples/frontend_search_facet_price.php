@@ -1,7 +1,7 @@
 <?php
 
 /**
-* In this example, we make a simple search query, request a facet and get the search results and print the facet values and counter.
+* In this example, we make a simple search query, request a facet and get the search results and print the facet values and counter for price ranges.
 * We also implement a simple link logic so that if the user clicks on one of the facet values the page is reloaded with the results with this facet value selected.
 */
 
@@ -26,19 +26,18 @@ try {
 	$language = "en"; // a valid language code (e.g.: "en", "fr", "de", "it", ...)
 	$queryText = "women"; // a search query
 	$hitCount = 10; //a maximum number of search result to return in one page
-	$facetField = "products_color"; //the field to consider in the filter
-	$selectedValue = isset($_REQUEST['bx_' . $facetField]) ? $_REQUEST['bx_' . $facetField] : null;
+	$selectedValue = isset($_REQUEST['bx_price']) ? $_REQUEST['bx_price'] : null;
 
 	//create search request
 	$bxRequest = new BxSearchRequest($language, $queryText, $hitCount);
 	
-	//set the fields to be returned for each item in the response
-	$bxRequest->setReturnFields(array($facetField));
-	
 	//add a facert
 	$facets = new BxFacets();
-	$facets->addFacet($facetField, $selectedValue);
+	$facets->addPriceRangeFacet($selectedValue);
 	$bxRequest->setFacets($facets);
+	
+	//set the fields to be returned for each item in the response
+	$bxRequest->setReturnFields(array($facets->getPriceFieldName()));
 	
 	//add the request
 	$bxClient->addRequest($bxRequest);
@@ -50,19 +49,19 @@ try {
 	$facets = $bxResponse->getFacets();
 	
 	//loop on the search response hit ids and print them
-	foreach($facets->getFacetValues($facetField) as $fieldValue) {
-		echo "<a href=\"?bx_" . $facetField . "=" . $facets->getFacetValueParameterValue($facetField, $fieldValue) . "\">" . $facets->getFacetValueLabel($facetField, $fieldValue) . "</a> (" . $facets->getFacetValueCount($facetField, $fieldValue) . ")";
-		if($facets->isFacetValueSelected($facetField, $fieldValue)) {
+	foreach($facets->getPriceRanges() as $fieldValue) {
+		echo "<a href=\"?bx_price=" . $facets->getPriceValueParameterValue($fieldValue) . "\">" . $facets->getPriceValueLabel($fieldValue) . "</a> (" . $facets->getPriceValueCount($fieldValue) . ")";
+		if($facets->isPriceValueSelected($fieldValue)) {
 			echo "<a href=\"?\">[X]</a>";
 		}
 		echo "<br>";
 	}
 	
 	//loop on the search response hit ids and print them
-	foreach($bxResponse->getHitFieldValues(array($facetField)) as $id => $fieldValueMap) {
+	foreach($bxResponse->getHitFieldValues(array($facets->getPriceFieldName())) as $id => $fieldValueMap) {
 		echo "<h3>$id</h3>";
 		foreach($fieldValueMap as $fieldName => $fieldValues) {
-			echo "$fieldName: " . implode(',', $fieldValues) . "<br>";
+			echo "Price: " . implode(',', $fieldValues) . "<br>";
 		}
 	}
 	

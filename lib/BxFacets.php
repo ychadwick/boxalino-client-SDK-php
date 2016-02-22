@@ -1,11 +1,15 @@
 <?php
 
+namespace com\boxalino\bxclient\v1;
+
 class BxFacets
 {
 	public $facets = array();
 	protected $facetResponse = null;
 	
 	protected $parameterPrefix = '';
+	
+	protected $priceFieldName = 'discountedPrice';
 	
 	public function setFacetResponse($facetResponse) {
 		$this->facetResponse = $facetResponse;
@@ -26,6 +30,15 @@ class BxFacets
 			$this->addFacet('category_id', $selectedValue, 'hierarchical', '1');
 		}
 		$this->addFacet($this->getCategoryFieldName(), null, 'hierarchical', $order);
+	}
+	
+	public function addPriceRangeFacet($selectedValue=null, $order=2, $label='Price', $fieldName = 'discountedPrice') {
+		$this->priceFieldName = $fieldName;
+		$this->addRangedFacet($fieldName, $selectedValue, $label, $order);
+	}
+	
+	public function addRangedFacet($fieldName, $selectedValue=null, $label=null, $order=2) {
+		$this->addFacet($fieldName, $selectedValue, 'ranged', $label, $order);
 	}
 
 	public function addFacet($fieldName, $selectedValue=null, $type='string', $label=null, $order=2) {
@@ -280,8 +293,16 @@ class BxFacets
 		return "";
 	}
 	
+	public function getPriceFieldName() {
+		return $this->priceFieldName;
+	}
+	
 	public function getCategories() {
 		return $this->getFacetValues($this->getCategoryFieldName());
+	}
+	
+	public function getPriceRanges() {
+		return $this->getFacetValues($this->getPriceFieldName());
 	}
 
     public function getFacetValues($fieldName) {
@@ -324,6 +345,10 @@ class BxFacets
 		return $this->getFacetValueLabel($this->getCategoryFieldName(), $facetValue);
 	}
 	
+	public function getPriceValueLabel($facetValue) {
+		return $this->getFacetValueLabel($this->getPriceFieldName(), $facetValue);
+	}
+	
 	public function getFacetValueLabel($fieldName, $facetValue) {
         list($label, $parameterValue, $hitCount, $selected) = $this->getFacetValueArray($fieldName, $facetValue);
 		return $label;
@@ -331,6 +356,10 @@ class BxFacets
 	
 	public function getCategoryValueCount($facetValue){
 		return $this->getFacetValueCount($this->getCategoryFieldName(), $facetValue);
+	}
+	
+	public function getPriceValueCount($facetValue) {
+		return $this->getFacetValueCount($this->getPriceFieldName(), $facetValue);
 	}
 
     public function getFacetValueCount($fieldName, $facetValue) {
@@ -341,11 +370,19 @@ class BxFacets
 	public function getCategoryValueId($facetValue) {
 		return $this->getFacetValueParameterValue($this->getCategoryFieldName(), $facetValue);
 	}
+	
+	public function getPriceValueParameterValue($facetValue) {
+		return $this->getFacetValueParameterValue($this->getPriceFieldName(), $facetValue);
+	}
 
     public function getFacetValueParameterValue($fieldName, $facetValue) {
         list($label, $parameterValue, $hitCount, $selected) = $this->getFacetValueArray($fieldName, $facetValue);
 		return $parameterValue;
     }
+	
+	public function isPriceValueSelected($facetValue) {
+		return $this->isFacetValueSelected($this->getPriceFieldName(), $facetValue);
+	}
 	
 	public function isFacetValueSelected($fieldName, $facetValue) {
         list($label, $parameterValue, $hitCount, $selected) = $this->getFacetValueArray($fieldName, $facetValue);

@@ -1,13 +1,15 @@
 <?php
 
+namespace com\boxalino\bxclient\v1;
+
 class BxRequest
 {
-	protected $indexId;
 	protected $language;
 	protected $choiceId;
 	protected $min;
 	protected $max;
 	
+	protected $indexId = null;
 	protected $returnFields = array();
 	protected $offset = 0;
 	protected $queryText = "";
@@ -16,8 +18,7 @@ class BxRequest
 	protected $bxFilters = array();
 	protected $orFilters = false;
 	
-	public function __construct($indexId, $language, $choiceId, $max=10, $min=0) {
-		$this->indexId = $indexId;
+	public function __construct($language, $choiceId, $max=10, $min=0) {
 		$this->language = $language;
 		$this->choiceId = $choiceId;
 		$this->min = (float)$min;
@@ -95,7 +96,7 @@ class BxRequest
 	
 	public function addSortField($field, $reverse = false) {
 		if($this->bxSortFields == null) {
-			$this->bxSortFields = new BxSortFields();
+			$this->bxSortFields = new \com\boxalino\bxclient\v1\BxSortFields();
 		}
 		$this->bxSortFields->push($field, $reverse);
 	}
@@ -124,7 +125,10 @@ class BxRequest
 		$this->min = $min;
 	}
 
-	public function getIndexId() {
+	public function getIndexId($defaultIndexId = null) {
+		if($this->indexId == null) {
+			return $defaultIndexId;
+		}
 		return $this->indexId;
 	}
 	
@@ -140,10 +144,10 @@ class BxRequest
 		$this->language = $language;
 	}
 
-	public function getSimpleSearchQuery() {
+	public function getSimpleSearchQuery($defaultIndexId) {
 		
 		$searchQuery = new \com\boxalino\p13n\api\thrift\SimpleSearchQuery();
-		$searchQuery->indexId = $this->getIndexId();
+		$searchQuery->indexId = $this->getIndexId($defaultIndexId);
 		$searchQuery->language = $this->getLanguage();
 		$searchQuery->returnFields = $this->getReturnFields();
 		$searchQuery->offset = $this->getOffset();

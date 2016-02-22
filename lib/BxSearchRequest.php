@@ -1,12 +1,14 @@
 <?php
 
+namespace com\boxalino\bxclient\v1;
+
 class BxSearchRequest extends BxRequest
 {
-	public function __construct($indexId, $language, $queryText, $max=10, $choiceId=null) {
+	public function __construct($language, $queryText, $max=10, $choiceId=null) {
 		if($choiceId == null) {
 			$choiceId = 'search';
 		}
-		parent::__construct($indexId, $language, $choiceId, $max, 0);
+		parent::__construct($language, $choiceId, $max, 0);
 		$this->setQueryText($queryText);
 	}
 }

@@ -1,5 +1,7 @@
 <?php
 
+namespace com\boxalino\bxclient\v1;
+
 class BxChooseResponse 
 {
 	private $response;
@@ -53,8 +55,10 @@ class BxChooseResponse
 	
 	public function getSearchResultHitIds($searchResult) {
 		$ids = array();
-        foreach ($searchResult->hits as $item) {
-			$ids[] = $item->values['id'][0];
+		if($searchResult) {
+			foreach ($searchResult->hits as $item) {
+				$ids[] = $item->values['id'][0];
+			}
 		}
         return $ids;
 	}
@@ -66,15 +70,17 @@ class BxChooseResponse
 	
 	public function getSearchHitFieldValues($searchResult, $fields) {
 		$fieldValues = array();
-		foreach ($searchResult->hits as $item) {
-			foreach ($fields as $field) {
-				if (isset($item->values[$field])) {
-					if (!empty($item->values[$field])) {
-						$fieldValues[$item->values['id'][0]][$field] = $item->values[$field];
+		if($searchResult) {
+			foreach ($searchResult->hits as $item) {
+				foreach ($fields as $field) {
+					if (isset($item->values[$field])) {
+						if (!empty($item->values[$field])) {
+							$fieldValues[$item->values['id'][0]][$field] = $item->values[$field];
+						}
 					}
-				}
-				if(!isset($fieldValues[$item->values['id'][0]][$field])) {
-					$fieldValues[$item->values['id'][0]][$field] = array();
+					if(!isset($fieldValues[$item->values['id'][0]][$field])) {
+						$fieldValues[$item->values['id'][0]][$field] = array();
+					}
 				}
 			}
 		}

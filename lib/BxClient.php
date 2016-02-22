@@ -1,5 +1,7 @@
 <?php
 
+namespace com\boxalino\bxclient\v1;
+
 class BxClient
 {
 	private $account;
@@ -241,7 +243,7 @@ class BxClient
 			
 			$choiceInquiry = new \com\boxalino\p13n\api\thrift\ChoiceInquiry();
 			$choiceInquiry->choiceId = $request->getChoiceId();
-			$choiceInquiry->simpleSearchQuery = $request->getSimpleSearchQuery();
+			$choiceInquiry->simpleSearchQuery = $request->getSimpleSearchQuery($this->getAccount());
 			$choiceInquiry->contextItems = $request->getContextItems();
 			$choiceInquiry->minHitCount = $request->getMin();
 			
@@ -256,7 +258,7 @@ class BxClient
 		if(!$this->chooseResponses) {
 			$this->choose();
 		}
-		return new \BxChooseResponse($this->chooseResponses, $this->chooseRequests);
+		return new \com\boxalino\bxclient\v1\BxChooseResponse($this->chooseResponses, $this->chooseRequests);
 	}
 	
 	/**
@@ -291,7 +293,7 @@ class BxClient
 		$autocompleteRequest->userRecord = $this->getUserRecord();
 		$autocompleteRequest->profileId = $profileid;
 		$autocompleteRequest->choiceId = $autocompleteChoice;
-        $autocompleteRequest->searchQuery = $bxRecommendation->getSimpleSearchQuery();
+        $autocompleteRequest->searchQuery = $bxRecommendation->getSimpleSearchQuery($this->getAccount());
         $autocompleteRequest->searchChoiceId = $bxRecommendation->getChoiceId();
 		$autocompleteRequest->autocompleteQuery = $this->getAutocompleteQuery($queryText, $suggestionsHitCount);
         
