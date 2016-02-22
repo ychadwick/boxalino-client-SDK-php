@@ -12,8 +12,8 @@ use com\boxalino\bxclient\v1\BxSearchRequest;
 BxClient::LOAD_CLASSES($libPath);
 
 //required parameters you should set for this example to work
-$account = "magento2_test_syl8"; // your account name
-$password = "magento2_test_syl8"; // your account password
+$account = ""; // your account name
+$password = ""; // your account password
 $domain = ""; // your web-site domain (e.g.: www.abc.com)
 
 //Create the Boxalino Client SDK instance

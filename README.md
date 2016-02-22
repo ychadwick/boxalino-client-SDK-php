@@ -1,0 +1,78 @@
+# boxalino Client SDK in PHP
+
+The Boxalino Client SDK provides a simple and efficient usage of Boxalino Search & Recommendations services (based on the p13n Thrift client libraries as separately provided in respective git-hub repositories) and to Boxalino Data Intelligence especially for Data Synchronization (define the structure of your data, push and publish your data structure configuration, push data in dev/prod and full/delta to Boxalino).
+
+The Boxalino Client SDK are particularly interesting for integrators of Boxalino technologies and provides the following advantages compare to using the underlying API directly:
+1. Very easy examples (such as frontend_search_basic) to start from (step by step)
+2. Many examples to understand each functionality individually
+3. Very little amount of code to write and to maintain (all the hard stuff is done in the client)
+4. Very well adapted for most MVC environment where the full requests / responses are not created all at the same place (easy to do if keeping the instance of BxClient as static)
+5. Many embedded logics not to worry about anymore (e.g.: search corrections directly active and integrated, no need to worry about it, a simple method returns if the query was corrected or not as indication)
+6. No need to create your XML data specification file by yourself anymore (provide the links to your data CSV and simple indications of which csv columsn to put in which fields)
+7. Easy to test data correctness automatically before sending your data to Boxalino Data Intelligence (client can check if there is any mis-match with your column to field specfications)
+8. Easy to interact with all the APIs (all calls are embedded in the client and you simply need to call simple to use methods of the client instance)
+9. Very easy to understand error messages and to know what to do (error messages often even indicates where it is most likely you should solve the problem, like in the case of issues with SSL certificates to get the connection)
+10. Easy to print the request Thrift object and send it to Boxalino for any support request
+
+## Installation
+
+1. Copy the lib folder wherever you want (it doesn't need to be called "lib")
+2. Take any of the examples in the "examples" folder to test (if $libPath as per the examples is set to the path to your lib folder, the rest should work out of the box)
+3. Make sure you have received your credentials (account and password) from Boxalino to access your account (if you don't have them, please contact support@boxalino.com)
+
+## Data Indexing examples
+
+under creation, will be added soon.
+
+## Search examples (provided in a good order to learn them step by step!)
+
+frontend_search_basic.php:
+In this example, we make a simple search query, get the search results and print their ids including a total counter.
+
+frontend_search_return_fields.php:
+In this example, we make a simple search query, defined additional fields to be returned for each reserult, get the search results and print their field values.
+
+frontend_search_2nd_page.php:
+In this example, we make a simple search query, get the second page of search results and print their ids.
+
+frontend_search_sort_field.php:
+In this example, we make a simple search query with a special sort order and get the first search results according to this order.
+
+frontend_search_facet.php:
+In this example, we make a simple search query, request a facet and get the search results and print the facet values and counter.
+
+frontend_search_facet_category.php:
+In this example, we make a simple search query, request a facet and get the search results and print the facet values and counter of categories.
+
+frontend_search_facet_price.php:
+In this example, we make a simple search query, request a facet and get the search results and print the facet values and counter for price ranges.
+
+frontend_search_corrected.php:
+In this example, we make a simple search query with a typo, get the search results and print the corrected query and the search results ids.
+
+frontend_search_sub_phrases.php:
+In this example, we make a simple search query containing two keywords which both provides search results alone, but none together. Then we show the two sub-phrases groups to let the user chose to search for one or the other.
+
+frontend_search_filter.php:
+In this example, we make a simple search query, add a filter and get the search results and print their ids.
+
+frontend_search_filter_advanced:
+In this example, we make a simple search query, add a more advanced filters with 2 fields with values and an or conditions between them and get the search results and print their ids.
+
+frontend_search_debug_request.php:
+In this example, we make a simple search query and we print the request object. This is very helpful to understand what could be the cause of a problem. Please always include the printout of this object in your support request to Boxalino.
+
+## Recommendations examples (provided in a good order to learn them step by step!)
+
+frontend_recommendations_similar.php:
+In this example, we make a simple recommendation example to display similar recommendations on a product detail page.
+
+frontend_recommendations_similar_complementary.php:
+In this example, we make a simple recommendation example to display both similar and complementary recommendations on a product detail page
+
+frontend_recommendations_basket.php:
+In this example, we make a simple recommendation example to display cross selling recommendations on a basket page.
+
+
+
+If you have any question, just contact us at support@boxalino.com
