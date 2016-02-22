@@ -2,7 +2,10 @@
 
 The Boxalino Client SDK provides a simple and efficient usage of Boxalino Search & Recommendations services (based on the p13n Thrift client libraries as separately provided in respective git-hub repositories) and to Boxalino Data Intelligence especially for Data Synchronization (define the structure of your data, push and publish your data structure configuration, push data in dev/prod and full/delta to Boxalino).
 
-The Boxalino Client SDK are particularly interesting for integrators of Boxalino technologies and provides the following advantages compare to using the underlying API directly:
+The Boxalino Client SDK are particularly interesting for integrators of Boxalino technologies and provides the following advantages compare to using the underlying API directly.
+
+## Key advantages
+
 1. Very easy examples (such as frontend_search_basic) to start from (step by step)
 2. Many examples to understand each functionality individually
 3. Very little amount of code to write and to maintain (all the hard stuff is done in the client)
@@ -24,55 +27,59 @@ The Boxalino Client SDK are particularly interesting for integrators of Boxalino
 
 under creation, will be added soon.
 
-## Search examples (provided in a good order to learn them step by step!)
+## Search examples
 
-frontend_search_basic.php:
+provided in a good order to learn them step by step!
+
+###### frontend_search_basic.php:
 In this example, we make a simple search query, get the search results and print their ids including a total counter.
 
-frontend_search_return_fields.php:
+###### frontend_search_return_fields.php:
 In this example, we make a simple search query, defined additional fields to be returned for each reserult, get the search results and print their field values.
 
-frontend_search_2nd_page.php:
+###### frontend_search_2nd_page.php:
 In this example, we make a simple search query, get the second page of search results and print their ids.
 
-frontend_search_sort_field.php:
+###### frontend_search_sort_field.php:
 In this example, we make a simple search query with a special sort order and get the first search results according to this order.
 
-frontend_search_facet.php:
+###### frontend_search_facet.php:
 In this example, we make a simple search query, request a facet and get the search results and print the facet values and counter.
 
-frontend_search_facet_category.php:
+###### frontend_search_facet_category.php:
 In this example, we make a simple search query, request a facet and get the search results and print the facet values and counter of categories.
 
-frontend_search_facet_price.php:
+###### frontend_search_facet_price.php:
 In this example, we make a simple search query, request a facet and get the search results and print the facet values and counter for price ranges.
 
-frontend_search_corrected.php:
+###### frontend_search_corrected.php:
 In this example, we make a simple search query with a typo, get the search results and print the corrected query and the search results ids.
 
-frontend_search_sub_phrases.php:
+###### frontend_search_sub_phrases.php:
 In this example, we make a simple search query containing two keywords which both provides search results alone, but none together. Then we show the two sub-phrases groups to let the user chose to search for one or the other.
 
-frontend_search_filter.php:
+###### frontend_search_filter.php:
 In this example, we make a simple search query, add a filter and get the search results and print their ids.
 
-frontend_search_filter_advanced:
+###### frontend_search_filter_advanced:
 In this example, we make a simple search query, add a more advanced filters with 2 fields with values and an or conditions between them and get the search results and print their ids.
 
-frontend_search_debug_request.php:
+###### frontend_search_debug_request.php:
 In this example, we make a simple search query and we print the request object. This is very helpful to understand what could be the cause of a problem. Please always include the printout of this object in your support request to Boxalino.
 
-## Recommendations examples (provided in a good order to learn them step by step!)
+## Recommendations examples
 
-frontend_recommendations_similar.php:
+provided in a good order to learn them step by step!
+
+###### frontend_recommendations_similar.php:
 In this example, we make a simple recommendation example to display similar recommendations on a product detail page.
 
-frontend_recommendations_similar_complementary.php:
+###### frontend_recommendations_similar_complementary.php:
 In this example, we make a simple recommendation example to display both similar and complementary recommendations on a product detail page
 
-frontend_recommendations_basket.php:
+###### frontend_recommendations_basket.php:
 In this example, we make a simple recommendation example to display cross selling recommendations on a basket page.
 
-
+## Contact us!
 
 If you have any question, just contact us at support@boxalino.com
