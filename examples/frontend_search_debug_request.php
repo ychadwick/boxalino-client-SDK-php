@@ -31,7 +31,7 @@ try {
 	//add the request
 	$bxClient->addRequest($bxRequest);
 	
-	//retrieve the search response object (if no parameter provided, method returns response to first request)
+	//make the query to Boxalino server and get back the response for all requests
 	$bxResponse = $bxClient->getResponse();
 	
 	//print the request object which is sent to our server (please provide it to Boxalino in all your support requests)

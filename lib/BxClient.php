@@ -228,6 +228,7 @@ class BxClient
 	}
 	
 	public function addRequest($request) {
+		$request->setDefaultIndexId($this->getAccount());
 		$this->chooseRequests[] = $request;
 	}
 	

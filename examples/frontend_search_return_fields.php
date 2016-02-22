@@ -35,7 +35,7 @@ try {
 	//add the request
 	$bxClient->addRequest($bxRequest);
 	
-	//retrieve the search response object (if no parameter provided, method returns response to first request)
+	//make the query to Boxalino server and get back the response for all requests
 	$bxResponse = $bxClient->getResponse();
 	
 	//loop on the search response hit ids and print them

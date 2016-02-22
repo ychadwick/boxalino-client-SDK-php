@@ -135,15 +135,23 @@ class BxRequest
 		$this->min = $min;
 	}
 
-	public function getIndexId($defaultIndexId = null) {
-		if($this->indexId == null) {
-			return $defaultIndexId;
-		}
+	public function getIndexId() {
 		return $this->indexId;
 	}
 	
 	public function setIndexId($indexId) {
 		$this->indexId = $indexId;
+		foreach($this->contextItems as $k => $contextItem) {
+			if($contextItem->indexId == null) {
+				$this->contextItems[$k]->indexId = $indexId;
+			}
+		}
+	}
+	
+	public function setDefaultIndexId($indexId) {
+		if($this->indexId == null) {
+			$this->setIndexId($indexId);
+		}
 	}
 
 	public function getLanguage() {
@@ -154,10 +162,10 @@ class BxRequest
 		$this->language = $language;
 	}
 
-	public function getSimpleSearchQuery($defaultIndexId) {
+	public function getSimpleSearchQuery() {
 		
 		$searchQuery = new \com\boxalino\p13n\api\thrift\SimpleSearchQuery();
-		$searchQuery->indexId = $this->getIndexId($defaultIndexId);
+		$searchQuery->indexId = $this->getIndexId();
 		$searchQuery->language = $this->getLanguage();
 		$searchQuery->returnFields = $this->getReturnFields();
 		$searchQuery->offset = $this->getOffset();
@@ -183,14 +191,14 @@ class BxRequest
 	protected $contextItems = array();
 	public function setProductContext($fieldName, $contextItemId, $role = 'mainProduct') {
 		$contextItem = new \com\boxalino\p13n\api\thrift\ContextItem();
-		$contextItem->indexId = $this->getAccount();
+		$contextItem->indexId = $this->getIndexId();
 		$contextItem->fieldName = $fieldName;
 		$contextItem->contextItemId = $contextItemId;
 		$contextItem->role = $role;
 		$this->contextItems[] = $contextItem;
 	}
 	
-	public function setBasketContext($fieldName, $basketContent, $role = 'mainProduct') {
+	public function setBasketProductWithPrices($fieldName, $basketContent, $role = 'mainProduct', $subRole = 'mainProduct') {
 		if ($basketContent !== false && count($basketContent)) {
 			
 			// Sort basket content by price
@@ -206,7 +214,7 @@ class BxRequest
 			$basketItem = array_shift($basketContent);
 
 			$contextItem = new \com\boxalino\p13n\api\thrift\ContextItem();
-			$contextItem->indexId = $this->getAccount();
+			$contextItem->indexId = $this->getIndexId();
 			$contextItem->fieldName = $fieldName;
 			$contextItem->contextItemId = $basketItem['id'];
 			$contextItem->role = $role;
@@ -215,10 +223,10 @@ class BxRequest
 
 			foreach ($basketContent as $basketItem) {
 				$contextItem = new \com\boxalino\p13n\api\thrift\ContextItem();
-				$contextItem->indexId = $this->getAccount();
+				$contextItem->indexId = $this->getIndexId();
 				$contextItem->fieldName = $fieldName;
 				$contextItem->contextItemId = $basketItem['id'];
-				$contextItem->role = $role;
+				$contextItem->role = $subRole;
 
 				$this->contextItems[] = $contextItem;
 			}
