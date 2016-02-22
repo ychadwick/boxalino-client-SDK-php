@@ -235,8 +235,7 @@ class BxClient
 		$this->chooseRequests = array();
 	}
 	
-	protected function choose() {
-		
+	public function getThriftChoiceRequest() {
 		$choiceInquiries = array();
 		
 		foreach($this->chooseRequests as $request) {
@@ -246,12 +245,17 @@ class BxClient
 			$choiceInquiry->simpleSearchQuery = $request->getSimpleSearchQuery($this->getAccount());
 			$choiceInquiry->contextItems = $request->getContextItems();
 			$choiceInquiry->minHitCount = $request->getMin();
+			$choiceInquiry->withRelaxation = $request->getWithRelaxation();
 			
 			$choiceInquiries[] = $choiceInquiry;
 		}
 
 		$choiceRequest = $this->getChoiceRequest($choiceInquiries, $this->getRequestContext());
-		$this->chooseResponses = $this->p13nchoose($choiceRequest);
+		return $choiceRequest;
+	}
+	
+	protected function choose() {
+		$this->chooseResponses = $this->p13nchoose($this->getThriftChoiceRequest());
 	}
 	
 	public function getResponse() {

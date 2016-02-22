@@ -1,7 +1,7 @@
 <?php
 
 /**
-* In this example, we make a simple search query, get the search results and print their ids including a total counter
+* In this example, we make a simple search query and we print the request object. This is very helpful to understand what could be the cause of a problem. Please always include the printout of this object in your support request to Boxalino.
 */
 
 //include the Boxalino Client SDK php files
@@ -34,13 +34,11 @@ try {
 	//retrieve the search response object (if no parameter provided, method returns response to first request)
 	$bxResponse = $bxClient->getResponse();
 	
-	//indicate the search made with the number of results found
-	echo "Results for query \"" . $queryText . "\" (" . $bxResponse->getTotalHitCount() . "):<br><br>";
-	
-	//loop on the search response hit ids and print them
-	foreach($bxResponse->getHitIds() as $i => $id) {
-		echo "$i: returned id $id<br>";
-	}
+	//print the request object which is sent to our server (please provide it to Boxalino in all your support requests)
+	echo "<pre>";
+	var_dump($bxClient->getThriftChoiceRequest());
+	echo "</pre>";
+	exit;
 	
 } catch(\Exception $e) {
 	

@@ -117,7 +117,11 @@ class BxChooseResponse
 
     public function getTotalHitCount($choice=null, $considerRelaxation=true) {
 		$variant = $this->getChoiceResponseVariant($choice);
-		return $this->getVariantSearchResult($variant, $considerRelaxation)->totalHitCount;
+		$searchResult = $this->getVariantSearchResult($variant, $considerRelaxation);
+		if($searchResult == null) {
+			return 0;
+		}
+		return $searchResult->totalHitCount;
     }
 	
 	public function areResultsCorrected($choice=null) {
@@ -175,6 +179,14 @@ class BxChooseResponse
 		$searchResult = $this->getSubPhraseSearchResult($queryText, $choice);
 		if($searchResult) {
 			return $this->getSearchResultHitIds($searchResult);
+		}
+		return array();
+    }
+
+    public function getSubPhraseHitFieldValues($queryText, $fields, $choice=null, $considerRelaxation=true) {
+		$searchResult = $this->getSubPhraseSearchResult($queryText, $choice);
+		if($searchResult) {
+			return $this->getSearchHitFieldValues($searchResult, $fields);
 		}
 		return array();
     }

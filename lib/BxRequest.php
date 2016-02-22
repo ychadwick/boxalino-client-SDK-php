@@ -8,6 +8,7 @@ class BxRequest
 	protected $choiceId;
 	protected $min;
 	protected $max;
+	protected $withRelaxation;
 	
 	protected $indexId = null;
 	protected $returnFields = array();
@@ -26,6 +27,15 @@ class BxRequest
 		if($this->max == 0) {
 			$this->max = 1;
 		}
+		$this->withRelaxation = $choiceId == 'search';
+	}
+	
+	public function getWithRelaxation() {
+		return $this->withRelaxation;
+	}
+	
+	public function setWithRelaxation($withRelaxation) {
+		$this->withRelaxation = $withRelaxation;
 	}
 	
 	public function getReturnFields() {

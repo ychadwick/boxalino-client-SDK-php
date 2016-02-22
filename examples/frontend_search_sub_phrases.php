@@ -1,7 +1,7 @@
 <?php
 
 /**
-* In this example, we make a simple search query, get the search results and print their ids including a total counter
+* In this example, we make a simple search query containing two keywords which both provides search results alone, but none together. Then we show the two sub-phrases groups to let the user chose to search for one or the other.
 */
 
 //include the Boxalino Client SDK php files
@@ -22,7 +22,7 @@ $bxClient = new BxClient($account, $password, $domain);
 
 try {
 	$language = "en"; // a valid language code (e.g.: "en", "fr", "de", "it", ...)
-	$queryText = "women"; // a search query
+	$queryText = "women pack"; // a search query
 	$hitCount = 10; //a maximum number of search result to return in one page
 
 	//create search request
@@ -34,13 +34,24 @@ try {
 	//retrieve the search response object (if no parameter provided, method returns response to first request)
 	$bxResponse = $bxClient->getResponse();
 	
-	//indicate the search made with the number of results found
-	echo "Results for query \"" . $queryText . "\" (" . $bxResponse->getTotalHitCount() . "):<br><br>";
-	
-	//loop on the search response hit ids and print them
-	foreach($bxResponse->getHitIds() as $i => $id) {
-		echo "$i: returned id $id<br>";
+	//check if the system has generated sub phrases results
+	if($bxResponse->areThereSubPhrases()) {
+		echo "No results found for all words in " . $queryText . ", but following partial matches were found:<br><br>";
+		foreach($bxResponse->getSubPhrasesQueries() as $subPhrase) {
+			echo "Results for \"" . $subPhrase . "\" (" . $bxResponse->getSubPhraseTotalHitCount($subPhrase) . " hits):<br>";
+			//loop on the search response hit ids and print them
+			foreach($bxResponse->getSubPhraseHitIds($subPhrase) as $i => $id) {
+				echo "$i: returned id $id<br>";
+			}
+			echo "<br>";
+		}
+	} else {
+		//loop on the search response hit ids and print them
+		foreach($bxResponse->getHitIds() as $i => $id) {
+			echo "$i: returned id $id<br>";
+		}
 	}
+	
 	
 } catch(\Exception $e) {
 	

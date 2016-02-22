@@ -1,7 +1,7 @@
 <?php
 
 /**
-* In this example, we make a simple search query, get the search results and print their ids including a total counter
+* In this example, we make a simple search query with a typo, get the search results and print the corrected query and the search results ids
 */
 
 //include the Boxalino Client SDK php files
@@ -22,7 +22,7 @@ $bxClient = new BxClient($account, $password, $domain);
 
 try {
 	$language = "en"; // a valid language code (e.g.: "en", "fr", "de", "it", ...)
-	$queryText = "women"; // a search query
+	$queryText = "womem"; // a search query
 	$hitCount = 10; //a maximum number of search result to return in one page
 
 	//create search request
@@ -34,8 +34,10 @@ try {
 	//retrieve the search response object (if no parameter provided, method returns response to first request)
 	$bxResponse = $bxClient->getResponse();
 	
-	//indicate the search made with the number of results found
-	echo "Results for query \"" . $queryText . "\" (" . $bxResponse->getTotalHitCount() . "):<br><br>";
+	//if the query is corrected, then print the corrrect query text
+	if($bxResponse->areResultsCorrected()) {
+		echo "Corrected query \"" . $queryText . "\" into \"" . $bxResponse->getCorrectedQuery() . "\"<br><br>";
+	}
 	
 	//loop on the search response hit ids and print them
 	foreach($bxResponse->getHitIds() as $i => $id) {
