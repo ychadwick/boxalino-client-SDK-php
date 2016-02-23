@@ -16,6 +16,7 @@ class BxClient
 	private $domain;
 	private $language;
 	
+	private $autocompleteRequest = null;
 	private $autocompleteResponse = null;
 	
 	private $chooseRequests = array();
@@ -69,8 +70,10 @@ class BxClient
 		require_once($libPath . "/BxRequest.php");
 		require_once($libPath . "/BxRecommendationRequest.php");
 		require_once($libPath . "/BxSearchRequest.php");
+		require_once($libPath . "/BxAutocompleteRequest.php");
 		require_once($libPath . "/BxSortFields.php");
 		require_once($libPath . "/BxChooseResponse.php");
+		require_once($libPath . "/BxAutocompleteResponse.php");
 	}
 	
 	public function getAccount() {
@@ -266,99 +269,33 @@ class BxClient
 		return new \com\boxalino\bxclient\v1\BxChooseResponse($this->chooseResponses, $this->chooseRequests);
 	}
 	
-	/**
-	* AUTOCOMPLETE METHODS
-	*/
+	public function setAutocompleteRequest($request) {
+		$request->setDefaultIndexId($this->getAccount());
+		$this->autocompleteRequest = $request;
+	}
 	
 	private function p13nautocomplete($autocompleteRequest) {
 		try {
-			return $this->getP13n()->autocomplete($choiceRequest);
+			return $this->getP13n()->autocomplete($autocompleteRequest);
 		} catch(\Exception $e) {
 			$this->throwCorrectP13nException($e);
 		}
 	}
 	
-	private function getAutocompleteQuery($queryText, $suggestionsHitCount) {
-		$autocompleteQuery = new \com\boxalino\p13n\api\thrift\AutocompleteQuery();
-        $autocompleteQuery->indexId = $this->getAccount();
-        $autocompleteQuery->language = $this->language;
-        $autocompleteQuery->queryText = $queryText;
-        $autocompleteQuery->suggestionsHitCount = $suggestionsHitCount;
-        $autocompleteQuery->highlight = true;
-        $autocompleteQuery->highlightPre = '<em>';
-        $autocompleteQuery->highlightPost = '</em>';
-		return $autocompleteQuery;
-	}
-	
-    public function autocomplete($bxRecommendation, $suggestionsHitCount, $autocompleteChoice = 'autocomplete')
+    public function autocomplete()
     {
         list($sessionid, $profileid) = $this->getSessionAndProfile();
         
-		$autocompleteRequest = new \com\boxalino\p13n\api\thrift\AutocompleteRequest();
-		$autocompleteRequest->userRecord = $this->getUserRecord();
-		$autocompleteRequest->profileId = $profileid;
-		$autocompleteRequest->choiceId = $autocompleteChoice;
-        $autocompleteRequest->searchQuery = $bxRecommendation->getSimpleSearchQuery($this->getAccount());
-        $autocompleteRequest->searchChoiceId = $bxRecommendation->getChoiceId();
-		$autocompleteRequest->autocompleteQuery = $this->getAutocompleteQuery($queryText, $suggestionsHitCount);
+		$autocompleteRequest = $this->autocompleteRequest->getAutocompleteThriftRequest($profileid, $this->getUserRecord());
         
-		$this->autocompleteResponse = $this->p13nautocomplete($autocompleteRequest);
+		$this->autocompleteResponse = new BxAutocompleteResponse($this->p13nautocomplete($autocompleteRequest), $this->autocompleteRequest);
 
     }
 	
 	public function getAutocompleteResponse() {
-		if($this->autocompleteResponse == null) {
-			throw new \Exception("getAutocompleteResponse called before any call to autocomplete method");
+		if(!$this->autocompleteResponse) {
+			$this->autocomplete();
 		}
-		return $this->autocompleteResponse;
-	}
-
-    public function getACPrefixSearchHash() {
-        if ($this->getAutocompleteResponse()->prefixSearchResult->totalHitCount > 0) {
-            return substr(md5($this->getAutocompleteResponse()->prefixSearchResult->queryText), 0, 10);
-        } else {
-            return null;
-        }
-    }
-	
-	public function getAutocompleteTextualSuggestions() {
-		$suggestions = array();
-		foreach ($this->getAutocompleteResponse()->hits as $hit) {
-			$suggestions[] = $hit->suggestion;
-        }
-        return $suggestions;
-	}
-	
-	protected function getAutocompleteTextualSuggestionHit($suggestion) {
-		foreach ($this->getAutocompleteResponse()->hits as $hit) {
-			if($hit->suggestion == $suggestion) {
-				return $hit;
-			}
-		}
-		throw new \Exception("unexisting textual suggestion provided " . $suggestion);
-	}
-	
-	public function getAutocompleteTextualSuggestionTotalHitCount($suggestion) {
-		$hit = $this->getAutocompleteTextualSuggestionHit($suggestion);
-		return $hit->searchResult->totalHitCount;
-	}
-	
-	public function getAutocompleteProducts($fields, $suggestion=null) {
-		$searchResult = $suggestion == null ? $this->getAutocompleteResponse()->prefixSearchResult : $this->getAutocompleteTextualSuggestionHit($suggestion)->searchResult;
-		
-		$products = array();
-		foreach($searchResult->hits as $item) {
-			$values = array();
-			foreach($fields as $field) {
-				if(isset($item->values[$field])) {
-					$values[$field] = $item->values[$field];
-				} else {
-					$values[$field] = array();
-				}
-			}
-			$k = isset($item->values['id'][0]) ? $item->values['id'][0] : sizeof($products);
-			$products[$k] = $values;
-		}
-		return $products;
+		return new \com\boxalino\bxclient\v1\BxAutocompleteResponse($this->autocompleteResponse, $this->autocompleteRequest);
 	}
 }

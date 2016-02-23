@@ -30,6 +30,12 @@ class BxChooseResponse
 		if (!empty($response->variants) && isset($response->variants[$id])) {
             return $response->variants[$id];
 		}
+		//autocompletion case (no variants)
+		if(get_class($response) == 'com\boxalino\p13n\api\thrift\SearchResult') {
+			$variant = new \com\boxalino\p13n\api\thrift\Variant();
+			$variant->searchResult = $response;
+			return $variant;
+		}
 		throw new \Exception("no variant provided in choice response for variant id $id");
 	}
 	

@@ -6,7 +6,7 @@ The Boxalino Client SDK are particularly interesting for integrators of Boxalino
 
 ## Key advantages
 
-1. Very easy examples (such as frontend_search_basic) to start from (step by step)
+1. Very easy examples (such as frontend search basic) to start from (step by step)
 2. Many examples to understand each functionality individually
 3. Very little amount of code to write and to maintain (all the hard stuff is done in the client)
 4. Very well adapted for most MVC environment where the full requests / responses are not created all at the same place (easy to do if keeping the instance of BxClient as static)
@@ -31,53 +31,63 @@ under creation, will be added soon.
 
 provided in a good order to learn them step by step!
 
-###### frontend_search_basic.php:
+###### frontend search basic:
 In this example, we make a simple search query, get the search results and print their ids including a total counter.
 
-###### frontend_search_return_fields.php:
+###### frontend search return fields:
 In this example, we make a simple search query, defined additional fields to be returned for each reserult, get the search results and print their field values.
 
-###### frontend_search_2nd_page.php:
+###### frontend search 2nd page:
 In this example, we make a simple search query, get the second page of search results and print their ids.
 
-###### frontend_search_sort_field.php:
+###### frontend search sort field:
 In this example, we make a simple search query with a special sort order and get the first search results according to this order.
 
-###### frontend_search_facet.php:
+###### frontend search facet:
 In this example, we make a simple search query, request a facet and get the search results and print the facet values and counter.
 
-###### frontend_search_facet_category.php:
+###### frontend search facet category:
 In this example, we make a simple search query, request a facet and get the search results and print the facet values and counter of categories.
 
-###### frontend_search_facet_price.php:
+###### frontend search facet price:
 In this example, we make a simple search query, request a facet and get the search results and print the facet values and counter for price ranges.
 
-###### frontend_search_corrected.php:
+###### frontend search corrected:
 In this example, we make a simple search query with a typo, get the search results and print the corrected query and the search results ids.
 
-###### frontend_search_sub_phrases.php:
+###### frontend search sub phrases:
 In this example, we make a simple search query containing two keywords which both provides search results alone, but none together. Then we show the two sub-phrases groups to let the user chose to search for one or the other.
 
-###### frontend_search_filter.php:
+###### frontend search filter:
 In this example, we make a simple search query, add a filter and get the search results and print their ids.
 
-###### frontend_search_filter_advanced:
+###### frontend search filter advanced:
 In this example, we make a simple search query, add a more advanced filters with 2 fields with values and an or conditions between them and get the search results and print their ids.
 
-###### frontend_search_debug_request.php:
+###### frontend search debug request:
 In this example, we make a simple search query and we print the request object. This is very helpful to understand what could be the cause of a problem. Please always include the printout of this object in your support request to Boxalino.
+
+## Search autocomplete examples
+
+provided in a good order to learn them step by step!
+
+###### frontend search autocomplete basic:
+In this example, we make a simple search autocomplete query, get the textual search suggestions.
+
+###### frontend search autocomplete items:
+In this example, we make a simple search autocomplete query, get the textual search suggestions and the item suggestions for each textual suggestion and globally.
 
 ## Recommendations examples
 
 provided in a good order to learn them step by step!
 
-###### frontend_recommendations_similar.php:
+###### frontend recommendations similar:
 In this example, we make a simple recommendation example to display similar recommendations on a product detail page.
 
-###### frontend_recommendations_similar_complementary.php:
+###### frontend recommendations similar complementary:
 In this example, we make a simple recommendation example to display both similar and complementary recommendations on a product detail page
 
-###### frontend_recommendations_basket.php:
+###### frontend recommendations basket:
 In this example, we make a simple recommendation example to display cross selling recommendations on a basket page.
 
 ## Contact us!
