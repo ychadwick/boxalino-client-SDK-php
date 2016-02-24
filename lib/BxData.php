@@ -42,7 +42,22 @@ class BxData
 		return $sourceKey;
 	}
 	
+	public function addMainCSVCustomerFile($filePath, $itemIdColumn, $encoding = 'UTF-8', $delimiter = ',', $enclosure = '&quot;', $escape = "\\", $lineSeparator = "\n", $sourceId = 'customers', $container = 'customers', $validate=true) {
+		$sourceKey = $this->addCSVItemFile($filePath, $itemIdColumn, $encoding, $delimiter, $enclosure, $escape, $lineSeparator, $sourceId, $container, $validate);
+		$this->addSourceIdField($sourceKey, $itemIdColumn, null, $validate) ;
+		$this->addSourceStringField($sourceKey, "bx_customer_id", $itemIdColumn, null, $validate) ;
+		return $sourceKey;
+	}
+	
 	public function addCSVItemFile($filePath, $itemIdColumn, $encoding = 'UTF-8', $delimiter = ',', $enclosure = '&quot;', $escape = "\\", $lineSeparator = "\n", $sourceId = null, $container = 'products', $validate=true) {
+		$params = array('itemIdColumn'=>$itemIdColumn, 'encoding'=>$encoding, 'delimiter'=>$delimiter, 'enclosure'=>$enclosure, 'escape'=>$escape, 'lineSeparator'=>$lineSeparator);
+		if($sourceId == null) {
+			$sourceId = $this->getFileNameFromPath($filePath, true);
+		}
+		return $this->addSourceFile($filePath, $sourceId, $container, 'item_data_file', 'CSV', $params, $validate);
+	}
+	
+	public function addCSVCustomerFile($filePath, $itemIdColumn, $encoding = 'UTF-8', $delimiter = ',', $enclosure = '&quot;', $escape = "\\", $lineSeparator = "\n", $sourceId = null, $container = 'customers', $validate=true) {
 		$params = array('itemIdColumn'=>$itemIdColumn, 'encoding'=>$encoding, 'delimiter'=>$delimiter, 'enclosure'=>$enclosure, 'escape'=>$escape, 'lineSeparator'=>$lineSeparator);
 		if($sourceId == null) {
 			$sourceId = $this->getFileNameFromPath($filePath, true);
@@ -61,6 +76,26 @@ class BxData
 			$sourceId = 'resource_' . $this->getFileNameFromPath($filePath, true);
 		}
 		return $this->addSourceFile($filePath, $sourceId, $container, 'resource', 'CSV', $params, $validate);
+	}
+	
+	
+	
+	public function setCSVTransactionFile($filePath, $orderIdColumn, $productIdColumn, $customerIdColumn, $orderDateIdColumn, $totalOrderValueColumn, $productListPriceColumn, $productDiscountedPriceColumn, $productIdField='bx_item_id', $customerIdField='bx_customer_id', $productsContainer = 'products', $customersContainer = 'customers', $format = 'CSV', $encoding = 'UTF-8', $delimiter = ',', $enclosure = '&quot;', $escape = "\\", $lineSeparator = "\n",$container = 'transactions', $sourceId = 'transactions', $validate=true) {
+		
+		$params = array('encoding'=>$encoding, 'delimiter'=>$delimiter, 'enclosure'=>$enclosure, 'escape'=>$escape, 'lineSeparator'=>$lineSeparator);
+		
+		$params['file'] = $this->getFileNameFromPath($filePath);
+		$params['orderIdColumn'] = $orderIdColumn;
+		$params['productIdColumn'] = $productIdColumn;
+		$params['product_property_id'] = $productIdField;
+		$params['customerIdColumn'] = $customerIdColumn;
+		$params['customer_property_id'] = $customerIdField;
+		$params['productListPriceColumn'] = $productListPriceColumn;
+		$params['productDiscountedPriceColumn'] = $productDiscountedPriceColumn;
+		$params['totalOrderValueColumn'] = $totalOrderValueColumn;
+		$params['orderReceptionDateColumn'] = $orderDateIdColumn;
+		
+		$this->addSourceFile($filePath, $sourceId, $container, 'transactions', $format, $params, $validate);
 	}
 	
 	public function addSourceFile($filePath, $sourceId, $container, $type, $format='CSV', $params=array(), $validate=true) {
@@ -266,6 +301,14 @@ class BxData
 					$parameters['labelColumns'] = false;
 					$sourceValues['itemIdColumn'] = $sourceValues['referenceIdColumn'];
 					break;
+					
+				case 'transactions':
+					$parameters = $sourceValues;
+					unset($parameters['filePath']);
+					unset($parameters['type']);
+					unset($parameters['product_property_id']);
+					unset($parameters['customer_property_id']);
+					break;
 				}
 				
 				foreach($parameters as $parameter => $defaultValue) {
@@ -282,6 +325,22 @@ class BxData
 						}
 					} else {
 						$param->addAttribute('value', $value);
+					}
+					
+					if($sourceValues['type'] == 'transactions') {
+						switch($parameter) {
+						case 'productIdColumn':
+							$param->addAttribute('product_property_id', $sourceValues['product_property_id']);
+							break;
+							
+						case 'customerIdColumn':
+							$param->addAttribute('customer_property_id', $sourceValues['customer_property_id']);
+							
+							if(isset($sourceValues['guest_property_id'])) {
+								$param->addAttribute('guest_property_id', $sourceValues['guest_property_id']);
+							}
+							break;
+						}
 					}
 				}
 				

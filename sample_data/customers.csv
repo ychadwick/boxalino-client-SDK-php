@@ -1,0 +1,2 @@
+customer_id,country,zip,confirmation,created_at,created_in,default_billing,default_shipping,disable_auto_group_change,dob,email,firstname,gender,group_id,lastname,middlename,password_hash,prefix,rp_token,rp_token_created_at,store_id,suffix,taxvat,updated_at,website_id
+1,,,roni_cost@example.com,,,,,,,,,,,,,,,,,,,,,

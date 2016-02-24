@@ -42,6 +42,12 @@ In this example, we take a very simple CSV file with product data, generate the 
 ###### backend data resource:
 In this example, we take a very simple CSV file with product data a reference data (and the link between them), generate the specifications, load them, publish them and push the data to Boxalino Data Intelligence.
 
+###### backend data customers:
+In this example, we take very simple CSV files with product data and customer data, generate the specifications, load them, publish them and push the data to Boxalino Data Intelligence.
+
+###### backend data transactions:
+In this example, we take very simple CSV files with product data, customer data and transactions historical data generate the specifications, load them, publish them and push the data to Boxalino Data Intelligence.
+
 ## Search examples
 
 provided in a good order to learn them step by step!
