@@ -1,7 +1,7 @@
 <?php
 
 /**
-* In this example, we take a very simple CSV file with product data, generate the specifications, load them, publish them and push the data to Boxalino Data Intelligence
+* In this example, we take a very simple CSV file with product data, generate the specifications of a field splitting it's values (field provided as coma separated values in one csv cell), load them, publish them and push the data to Boxalino Data Intelligence
 */
 
 //include the Boxalino Client SDK php files
@@ -35,12 +35,8 @@ try {
 	if(!$isDelta) {
 	
 		//declare the fields
-		$bxData->addSourceTitleField($sourceKey, array("en"=>"name_en"));
-		$bxData->addSourceDescriptionField($sourceKey, array("en"=>"description_en"));
-		$bxData->addSourceListPriceField($sourceKey, "list_price");
-		$bxData->addSourceDiscountedPriceField($sourceKey, "discounted_price");
-		$bxData->addSourceLocalizedTextField($sourceKey, "short_description", array("en"=>"short_description_en"));
-		$bxData->addSourceStringField($sourceKey, "sku", "sku");
+		$bxData->addSourceStringField($sourceKey, "related_product_ids", "related_product_ids");
+		$bxData->addFieldParameter($sourceKey, "related_product_ids", "splitValues", ",");
 		
 		echo "publish the data specifications<br>";
 		$bxData->pushDataSpecifications();

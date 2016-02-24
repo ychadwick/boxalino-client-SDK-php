@@ -1,0 +1,41 @@
+category_id,parent_id,value_fr,value_en
+1,,"Root Catalog","Root Catalog"
+2,1,"Default Category","Default Category"
+3,2,Gear,Gear
+4,3,Bags,Bags
+5,3,"Fitness Equipment","Fitness Equipment"
+6,3,Watches,Watches
+7,2,Collections,Collections
+8,7,"New Luma Yoga Collection","New Luma Yoga Collection"
+9,2,Training,Training
+10,9,"Video Download","Video Download"
+11,2,Men,Men
+12,11,Tops,Tops
+13,11,Bottoms,Bottoms
+14,12,Jackets,Jackets
+15,12,"Hoodies &amp; Sweatshirts","Hoodies &amp; Sweatshirts"
+16,12,Tees,Tees
+17,12,Tanks,Tanks
+18,13,Pants,Pants
+19,13,Shorts,Shorts
+20,2,Femmes,Women
+21,20,Tops,Tops
+22,20,Bottoms,Bottoms
+23,21,Jackets,Jackets
+24,21,"Hoodies &amp; Sweatshirts","Hoodies &amp; Sweatshirts"
+25,21,Tees,Tees
+26,21,"Bras &amp; Tanks","Bras &amp; Tanks"
+27,22,Pants,Pants
+28,22,Shorts,Shorts
+29,2,Promotions,Promotions
+30,29,"Women Sale","Women Sale"
+31,29,"Men Sale","Men Sale"
+32,29,Pants,Pants
+33,29,Tees,Tees
+34,7,"Erin Recommends","Erin Recommends"
+35,7,"Performance Fabrics","Performance Fabrics"
+36,7,"Eco Friendly","Eco Friendly"
+37,2,Sale,Sale
+38,2,"What's New","What's New"
+39,7,"Performance Sportswear New","Performance Sportswear New"
+40,7,"Nouvelle collection eco","Eco Collection New"

@@ -30,6 +30,18 @@ provided in a good order to learn them step by step!
 ###### backend data basic:
 In this example, we take a very simple CSV file with product data, generate the specifications, load them, publish them and push the data to Boxalino Data Intelligence.
 
+###### backend data debug xml:
+In this example, we take a very simple CSV file with product data, generate the specifications and print them in xml format.
+
+###### backend data categories:
+In this example, we take a very simple CSV file with product and categories data (and the link between them), generate the specifications, load them, publish them and push the data to Boxalino Data Intelligence.
+
+###### backend data split field values:
+In this example, we take a very simple CSV file with product data, generate the specifications of a field splitting it's values (field provided as coma separated values in one csv cell), load them, publish them and push the data to Boxalino Data Intelligence.
+
+###### backend data resource:
+In this example, we take a very simple CSV file with product data a reference data (and the link between them), generate the specifications, load them, publish them and push the data to Boxalino Data Intelligence.
+
 ## Search examples
 
 provided in a good order to learn them step by step!

@@ -1,7 +1,7 @@
 <?php
 
 /**
-* In this example, we take a very simple CSV file with product data, generate the specifications, load them, publish them and push the data to Boxalino Data Intelligence
+* In this example, we take a very simple CSV file with product data a reference data (and the link between them), generate the specifications, load them, publish them and push the data to Boxalino Data Intelligence
 */
 
 //include the Boxalino Client SDK php files
@@ -24,23 +24,30 @@ $bxData = new BxData(new BxClient($account, $password, $domain), $languages, $is
 
 try {
 	
-	$file = '../sample_data/products.csv'; //a csv file with header row
+	$mainProductFile = '../sample_data/products.csv'; //a csv file with header row
 	$itemIdColumn = 'id'; //the column header row name of the csv with the unique id of each item
 	
+	$colorFile = '../sample_data/color.csv'; //a csv file with header row
+	$colorIdColumn = 'color_id'; //column header row name of the csv with the unique category id
+	$colorLabelColumns = array('en'=>'value_en'); //column header row names of the csv with the category label in each language
+	
+	$productToColorsFile = '../sample_data/product_color.csv'; //a csv file with header row
+	
 	//add a csv file as main product file
-	$sourceKey = $bxData->addMainCSVItemFile($file, $itemIdColumn);
+	$mainSourceKey = $bxData->addMainCSVItemFile($mainProductFile, $itemIdColumn);
+	
+	//add a csv file with products ids to Colors ids
+	$productToColorsSourceKey = $bxData->addCSVItemFile($productToColorsFile, $itemIdColumn);
+	
+	//add a csv file with Colors
+	$colorSourceKey = $bxData->addResourceFile($colorFile, $colorIdColumn, $colorLabelColumns);
 	
 	//this part is only necessary to do when you push your data in full, as no specifications changes should not be published without a full data sync following next
 	//even when you publish your data in full, you don't need to repush your data specifications if you know they didn't change, however, it is totally fine (and suggested) to push them everytime if you are not sure if something changed or not
 	if(!$isDelta) {
-	
-		//declare the fields
-		$bxData->addSourceTitleField($sourceKey, array("en"=>"name_en"));
-		$bxData->addSourceDescriptionField($sourceKey, array("en"=>"description_en"));
-		$bxData->addSourceListPriceField($sourceKey, "list_price");
-		$bxData->addSourceDiscountedPriceField($sourceKey, "discounted_price");
-		$bxData->addSourceLocalizedTextField($sourceKey, "short_description", array("en"=>"short_description_en"));
-		$bxData->addSourceStringField($sourceKey, "sku", "sku");
+		
+		//declare the color field as a localized textual field with a resource source key
+		$bxData->addSourceLocalizedTextField($productToColorsSourceKey, "color", $colorIdColumn, $colorSourceKey);
 		
 		echo "publish the data specifications<br>";
 		$bxData->pushDataSpecifications();

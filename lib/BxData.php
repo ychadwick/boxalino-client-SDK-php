@@ -36,14 +36,34 @@ class BxData
 	}
 	
 	public function addMainCSVItemFile($filePath, $itemIdColumn, $encoding = 'UTF-8', $delimiter = ',', $enclosure = '&quot;', $escape = "\\", $lineSeparator = "\n", $sourceId = 'item_vals', $container = 'products', $validate=true) {
-		$params = array('encoding'=>$encoding, 'delimiter'=>$delimiter, 'enclosure'=>$enclosure, 'escape'=>$escape, 'lineSeparator'=>$lineSeparator);
-		$sourceKey = $this->addSourceFile($filePath, $itemIdColumn, $sourceId, $container, 'item_data_file', 'CSV', $params, $validate);
-		$this->addSourceIdField($sourceKey, $itemIdColumn, $validate) ;
-		$this->addSourceStringField($sourceKey, "bx_item_id", $itemIdColumn, $validate) ;
+		$sourceKey = $this->addCSVItemFile($filePath, $itemIdColumn, $encoding, $delimiter, $enclosure, $escape, $lineSeparator, $sourceId, $container, $validate);
+		$this->addSourceIdField($sourceKey, $itemIdColumn, null, $validate) ;
+		$this->addSourceStringField($sourceKey, "bx_item_id", $itemIdColumn, null, $validate) ;
 		return $sourceKey;
 	}
 	
-	public function addSourceFile($filePath, $itemIdColumn, $sourceId, $container, $type, $format='CSV', $params=array(), $validate=true) {
+	public function addCSVItemFile($filePath, $itemIdColumn, $encoding = 'UTF-8', $delimiter = ',', $enclosure = '&quot;', $escape = "\\", $lineSeparator = "\n", $sourceId = null, $container = 'products', $validate=true) {
+		$params = array('itemIdColumn'=>$itemIdColumn, 'encoding'=>$encoding, 'delimiter'=>$delimiter, 'enclosure'=>$enclosure, 'escape'=>$escape, 'lineSeparator'=>$lineSeparator);
+		if($sourceId == null) {
+			$sourceId = $this->getFileNameFromPath($filePath, true);
+		}
+		return $this->addSourceFile($filePath, $sourceId, $container, 'item_data_file', 'CSV', $params, $validate);
+	}
+	
+	public function addCategoryFile($filePath, $categoryIdColumn, $parentIdColumn, $categoryLabelColumns, $encoding = 'UTF-8', $delimiter = ',', $enclosure = '&quot;', $escape = "\\", $lineSeparator = "\n", $sourceId = 'resource_categories', $container = 'products', $validate=true) {
+		$params = array('referenceIdColumn'=>$categoryIdColumn, 'parentIdColumn'=>$parentIdColumn, 'labelColumns'=>$categoryLabelColumns, 'encoding'=>$encoding, 'delimiter'=>$delimiter, 'enclosure'=>$enclosure, 'escape'=>$escape, 'lineSeparator'=>$lineSeparator);
+		return $this->addSourceFile($filePath, $sourceId, $container, 'hierarchical', 'CSV', $params, $validate);
+	}
+	
+	public function addResourceFile($filePath, $categoryIdColumn, $labelColumns, $encoding = 'UTF-8', $delimiter = ',', $enclosure = '&quot;', $escape = "\\", $lineSeparator = "\n", $sourceId = null, $container = 'products', $validate=true) {
+		$params = array('referenceIdColumn'=>$categoryIdColumn, 'labelColumns'=>$labelColumns, 'encoding'=>$encoding, 'delimiter'=>$delimiter, 'enclosure'=>$enclosure, 'escape'=>$escape, 'lineSeparator'=>$lineSeparator);
+		if($sourceId == null) {
+			$sourceId = 'resource_' . $this->getFileNameFromPath($filePath, true);
+		}
+		return $this->addSourceFile($filePath, $sourceId, $container, 'resource', 'CSV', $params, $validate);
+	}
+	
+	public function addSourceFile($filePath, $sourceId, $container, $type, $format='CSV', $params=array(), $validate=true) {
 		if(sizeof($this->getLanguages())==0) {
 			throw new \Exception("trying to add a source before having declared the languages with method setLanguages");
 		}
@@ -51,7 +71,6 @@ class BxData
 			$this->sources[$container] = array();
 		}
 		$params['filePath'] = $filePath;
-		$params['itemIdColumn'] = $itemIdColumn;
 		$params['format'] = $format;
 		$params['type'] = $type;
 		$this->sources[$container][$sourceId] = $params;
@@ -93,7 +112,9 @@ class BxData
 	public function validateSource($container, $sourceId) {
 		$source = $this->sources[$container][$sourceId];
 		if($source['format'] == 'CSV') {
-			$this->validateColumnExistance($container, $sourceId, $source['itemIdColumn']);
+			if(isset($source['itemIdColumn'])) {
+				$this->validateColumnExistance($container, $sourceId, $source['itemIdColumn']);
+			}
 		}
 	}
 	
@@ -104,46 +125,54 @@ class BxData
 		}
 	}
 	
-	public function addSourceIdField($sourceKey, $col, $validate=true) {
-		$this->addSourceField($sourceKey, 'bx_id', "id", false, $col, $validate);
+	public function addSourceIdField($sourceKey, $col, $referenceSourceKey=null, $validate=true) {
+		$this->addSourceField($sourceKey, 'bx_id', "id", false, $col, $referenceSourceKey, $validate);
 	}
 	
-	public function addSourceTitleField($sourceKey, $colMap, $validate=true) {
-		$this->addSourceField($sourceKey, "bx_title", "title", true, $colMap, $validate);
+	public function addSourceTitleField($sourceKey, $colMap, $referenceSourceKey=null, $validate=true) {
+		$this->addSourceField($sourceKey, "bx_title", "title", true, $colMap, $referenceSourceKey, $validate);
 	}
 	
-	public function addSourceDescriptionField($sourceKey, $colMap, $validate=true) {
-		$this->addSourceField($sourceKey, "bx_description", "body", true, $colMap, $validate);
+	public function addSourceDescriptionField($sourceKey, $colMap, $referenceSourceKey=null, $validate=true) {
+		$this->addSourceField($sourceKey, "bx_description", "body", true, $colMap, $referenceSourceKey, $validate);
 	}
 	
-	public function addSourceListPriceField($sourceKey, $col, $validate=true) {
-		$this->addSourceField($sourceKey, "bx_listprice", "price", false, $col, $validate);
+	public function addSourceListPriceField($sourceKey, $col, $referenceSourceKey=null, $validate=true) {
+		$this->addSourceField($sourceKey, "bx_listprice", "price", false, $col, $referenceSourceKey, $validate);
 	}
 	
-	public function addSourceDiscountedPriceField($sourceKey, $col, $validate=true) {
-		$this->addSourceField($sourceKey, "bx_discountedprice", "discounted", false, $col, $validate);
+	public function addSourceDiscountedPriceField($sourceKey, $col, $referenceSourceKey=null, $validate=true) {
+		$this->addSourceField($sourceKey, "bx_discountedprice", "discounted", false, $col, $referenceSourceKey, $validate);
 	}
 	
-	public function addSourceLocalizedTextField($sourceKey, $fieldName, $colMap, $validate=true) {
-		$this->addSourceField($sourceKey, $fieldName, "text", true, $colMap, $validate);
+	public function addSourceLocalizedTextField($sourceKey, $fieldName, $colMap, $referenceSourceKey=null, $validate=true) {
+		$this->addSourceField($sourceKey, $fieldName, "text", true, $colMap, $referenceSourceKey, $validate);
 	}
 	
-	public function addSourceStringField($sourceKey, $fieldName, $col, $validate=true) {
-		$this->addSourceField($sourceKey, $fieldName, "string", false, $col, $validate);
+	public function addSourceStringField($sourceKey, $fieldName, $col, $referenceSourceKey=null, $validate=true) {
+		$this->addSourceField($sourceKey, $fieldName, "string", false, $col, $referenceSourceKey, $validate);
 	}
 	
-	public function addSourceNumberField($sourceKey, $fieldName, $col, $validate=true) {
-		$this->addSourceField($sourceKey, $fieldName, "number", false, $col, $validate);
+	public function addSourceNumberField($sourceKey, $fieldName, $col, $referenceSourceKey=null, $validate=true) {
+		$this->addSourceField($sourceKey, $fieldName, "number", false, $col, $referenceSourceKey, $validate);
 	}
 	
-	public function addSourceField($sourceKey, $fieldName, $type, $localized, $colMap, $validate=true) {
+	public function setCategoryField($sourceKey, $col, $referenceSourceKey="resource_categories", $validate=true) {
+		if($referenceSourceKey == "resource_categories") {
+			list($container, $sourceId) = $this->decodeSourceKey($sourceKey);
+			$referenceSourceKey = $this->encodesourceKey($container, $referenceSourceKey);
+		}
+		$this->addSourceField($sourceKey, "category", "hierarchical", false, $col, $referenceSourceKey, $validate);
+	}
+	
+	public function addSourceField($sourceKey, $fieldName, $type, $localized, $colMap, $referenceSourceKey=null, $validate=true) {
 		list($container, $sourceId) = $this->decodeSourceKey($sourceKey);
 		if(!isset($this->sources[$container][$sourceId]['fields'])) {
 			$this->sources[$container][$sourceId]['fields'] = array();
 		}
-		$this->sources[$container][$sourceId]['fields'][$fieldName] = array('type'=>$type, 'localized'=>$localized, 'map'=>$colMap);
+		$this->sources[$container][$sourceId]['fields'][$fieldName] = array('type'=>$type, 'localized'=>$localized, 'map'=>$colMap, 'referenceSourceKey'=>$referenceSourceKey);
 		if($this->sources[$container][$sourceId]['format'] == 'CSV') {
-			if($localized) {
+			if($localized && $referenceSourceKey == null) {
 				if(!is_array($colMap)) {
 					throw new \Exception("'$fieldName': invalid column field name for a localized field (expect an array with a column name for each language array(lang=>colName)): " . serialize($colMap));
 				}
@@ -167,6 +196,17 @@ class BxData
 				}
 			}
 		}
+	}
+	
+	public function addFieldParameter($sourceKey, $fieldName, $parameterName, $parameterValue) {
+		list($container, $sourceId) = $this->decodeSourceKey($sourceKey);
+		if(!isset($this->sources[$container][$sourceId]['fields'][$fieldName])) {
+			throw new \Exception("trying to add a field parameter on sourceId '$sourceId', container '$container', fieldName '$fieldName' while this field doesn't exist");
+		}
+		if(!isset($this->sources[$container][$sourceId]['fields'][$fieldName]['fieldParameters'])) {
+			$this->sources[$container][$sourceId]['fields'][$fieldName]['fieldParameters'] = array();
+		}
+		$this->sources[$container][$sourceId]['fields'][$fieldName]['fieldParameters'][$parameterName] = $parameterValue;
 	}
 	
 	public function getXML() {
@@ -198,50 +238,91 @@ class BxData
 				$source->addAttribute('id', $sourceId);
 				$source->addAttribute('type', $sourceValues['type']);
 				
-				$parts = explode('/', $sourceValues['filePath']);
-				$sourceValues['file'] = $parts[sizeof($parts)-1];
+				$sourceValues['file'] = $this->getFileNameFromPath($sourceValues['filePath']);
 				
 				$parameters = array(
 								'file'=>false,
-								'itemIdColumn'=>false, 
 								'format'=>'CSV', 
 								'encoding'=>'UTF-8', 
 								'delimiter'=>',', 
 								'enclosure'=>'"', 
 								'lineSeparator'=>"\\n"
 							);
-							
+				
+				switch($sourceValues['type']) {
+				case 'item_data_file':
+					$parameters['itemIdColumn'] = false;
+					break;
+					
+				case 'hierarchical':
+					$parameters['referenceIdColumn'] = false;
+					$parameters['parentIdColumn'] = false;
+					$parameters['labelColumns'] = false;
+					break;
+					
+				case 'resource':
+					$parameters['referenceIdColumn'] = false;
+					$parameters['itemIdColumn'] = false;
+					$parameters['labelColumns'] = false;
+					$sourceValues['itemIdColumn'] = $sourceValues['referenceIdColumn'];
+					break;
+				}
+				
 				foreach($parameters as $parameter => $defaultValue) {
 					$value = isset($sourceValues[$parameter]) ? $sourceValues[$parameter] : $defaultValue;
 					if($value === false) {
 						throw new \Exception("source parameter '$parameter' required but not defined in source id '$sourceId' for container '$containerName'");
 					}
 					$param = $source->addChild($parameter);
-					$param->addAttribute('value', $value);
-				}
-				
-				foreach($sourceValues['fields'] as $fieldId => $fieldValues) {
-					
-					$property = $properties->addChild('property');
-					$property->addAttribute('id', $fieldId);
-					$property->addAttribute('type', $fieldValues['type']);
-					
-					$transform = $property->addChild('transform');				
-					$logic = $property->addChild('logic');	
-					$logic->addAttribute('source', $sourceId);
-					$logic->addAttribute('type', 'direct');			
-					if($fieldValues['localized']) {
-						foreach($this->getLanguages() as $lang) {
-							$field = $logic->addChild('field');
-							$field->addAttribute('column', $fieldValues['map'][$lang]);
-							$field->addAttribute('language', $lang);			
+					if(is_array($value)) {
+						foreach($value as $language => $languageColumn) {
+							$languageParam = $param->addChild("language");
+							$languageParam->addAttribute('name', $language);
+							$languageParam->addAttribute('value', $languageColumn);
 						}
 					} else {
-						$field = $logic->addChild('field');
-						$field->addAttribute('column', $fieldValues['map']);
+						$param->addAttribute('value', $value);
 					}
-					
-					$params = $property->addChild('params');	
+				}
+				
+				if(isset($sourceValues['fields'])) {
+					foreach($sourceValues['fields'] as $fieldId => $fieldValues) {
+						
+						$property = $properties->addChild('property');
+						$property->addAttribute('id', $fieldId);
+						$property->addAttribute('type', $fieldValues['type']);
+						
+						$transform = $property->addChild('transform');				
+						$logic = $property->addChild('logic');	
+						$logic->addAttribute('source', $sourceId);
+						$referenceSourceKey = isset($fieldValues['referenceSourceKey']) ? $fieldValues['referenceSourceKey'] : null;
+						$logicType = $referenceSourceKey == null ? 'direct' : 'reference';
+						$logic->addAttribute('type', $logicType);			
+						if(is_array($fieldValues['map'])) {
+							foreach($this->getLanguages() as $lang) {
+								$field = $logic->addChild('field');
+								$field->addAttribute('column', $fieldValues['map'][$lang]);
+								$field->addAttribute('language', $lang);			
+							}
+						} else {
+							$field = $logic->addChild('field');
+							$field->addAttribute('column', $fieldValues['map']);
+						}
+						
+						$params = $property->addChild('params');
+						if($referenceSourceKey) {
+							$referenceSource = $params->addChild('referenceSource');
+							list($referenceContainer, $referenceSourceId) = $this->decodeSourceKey($referenceSourceKey);
+							$referenceSource->addAttribute('value', $referenceSourceId);
+						}
+						if(isset($fieldValues['fieldParameters'])) {
+							foreach($fieldValues['fieldParameters'] as $parameterName => $parameterValue) {
+								$fieldParameter = $params->addChild('fieldParameter');
+								$fieldParameter->addAttribute('name', $parameterName);
+								$fieldParameter->addAttribute('value', $parameterValue);
+							}
+						}
+					}
 				}
 			}
 		}
@@ -337,13 +418,22 @@ class BxData
 		return $this->callAPI($fields, $url);
 	}
 	
+	public function getFileNameFromPath($filePath, $withoutExtension=false) {
+		$parts = explode('/', $filePath);
+		$file = $parts[sizeof($parts)-1];
+		if($withoutExtension) {
+			$parts = explode('.', $file);
+			return $parts[0];
+		}
+		return $file;
+	}
+	
 	public function getFiles() {
 		$files = array();
 		foreach($this->sources as $container => $containerSources) {
 			foreach($containerSources as $sourceId => $sourceValues) {
 				if(!isset($sourceValues['file'])) {
-					$parts = explode('/', $sourceValues['filePath']);
-					$sourceValues['file'] = $parts[sizeof($parts)-1];
+					$sourceValues['file'] = $this->getFileNameFromPath($sourceValues['filePath']);
 				}
 				$files[$sourceValues['file']] = $sourceValues['filePath'];
 			}
