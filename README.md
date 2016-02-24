@@ -25,7 +25,10 @@ The Boxalino Client SDK are particularly interesting for integrators of Boxalino
 
 ## Data Indexing examples
 
-under creation, will be added soon.
+provided in a good order to learn them step by step!
+
+###### backend data basic:
+In this example, we take a very simple CSV file with product data, generate the specifications, load them, publish them and push the data to Boxalino Data Intelligence.
 
 ## Search examples
 

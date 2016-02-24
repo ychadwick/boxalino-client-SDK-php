@@ -74,13 +74,22 @@ class BxClient
 		require_once($libPath . "/BxSortFields.php");
 		require_once($libPath . "/BxChooseResponse.php");
 		require_once($libPath . "/BxAutocompleteResponse.php");
+		require_once($libPath . "/BxData.php");
 	}
 	
-	public function getAccount() {
-		if($this->isDev) {
+	public function getAccount($checkDev = true) {
+		if($checkDev && $this->isDev) {
 			return $this->account . '_dev';
 		}
 		return $this->account;
+	}
+	
+	public function getUsername() {
+		return $this->getAccount(false);
+	}
+	
+	public function getPassword() {
+		return $this->password;
 	}
 	
 	private function getSessionAndProfile() {
