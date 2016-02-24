@@ -35,21 +35,21 @@ class BxData
 		return $this->languages;
 	}
 	
-	public function addMainCSVItemFile($filePath, $itemIdColumn, $encoding = 'UTF-8', $delimiter = ',', $enclosure = '&quot;', $escape = "\\", $lineSeparator = "\n", $sourceId = 'item_vals', $container = 'products', $validate=true) {
+	public function addMainCSVItemFile($filePath, $itemIdColumn, $encoding = 'UTF-8', $delimiter = ',', $enclosure = "\"", $escape = "\\\\", $lineSeparator = "\\n", $sourceId = 'item_vals', $container = 'products', $validate=true) {
 		$sourceKey = $this->addCSVItemFile($filePath, $itemIdColumn, $encoding, $delimiter, $enclosure, $escape, $lineSeparator, $sourceId, $container, $validate);
 		$this->addSourceIdField($sourceKey, $itemIdColumn, null, $validate) ;
 		$this->addSourceStringField($sourceKey, "bx_item_id", $itemIdColumn, null, $validate) ;
 		return $sourceKey;
 	}
 	
-	public function addMainCSVCustomerFile($filePath, $itemIdColumn, $encoding = 'UTF-8', $delimiter = ',', $enclosure = '&quot;', $escape = "\\", $lineSeparator = "\n", $sourceId = 'customers', $container = 'customers', $validate=true) {
+	public function addMainCSVCustomerFile($filePath, $itemIdColumn, $encoding = 'UTF-8', $delimiter = ',', $enclosure = "\&", $escape = "\\\\", $lineSeparator = "\\n", $sourceId = 'customers', $container = 'customers', $validate=true) {
 		$sourceKey = $this->addCSVItemFile($filePath, $itemIdColumn, $encoding, $delimiter, $enclosure, $escape, $lineSeparator, $sourceId, $container, $validate);
 		$this->addSourceIdField($sourceKey, $itemIdColumn, null, $validate) ;
 		$this->addSourceStringField($sourceKey, "bx_customer_id", $itemIdColumn, null, $validate) ;
 		return $sourceKey;
 	}
 	
-	public function addCSVItemFile($filePath, $itemIdColumn, $encoding = 'UTF-8', $delimiter = ',', $enclosure = '&quot;', $escape = "\\", $lineSeparator = "\n", $sourceId = null, $container = 'products', $validate=true) {
+	public function addCSVItemFile($filePath, $itemIdColumn, $encoding = 'UTF-8', $delimiter = ',', $enclosure = "\&", $escape = "\\\\", $lineSeparator = "\\n", $sourceId = null, $container = 'products', $validate=true) {
 		$params = array('itemIdColumn'=>$itemIdColumn, 'encoding'=>$encoding, 'delimiter'=>$delimiter, 'enclosure'=>$enclosure, 'escape'=>$escape, 'lineSeparator'=>$lineSeparator);
 		if($sourceId == null) {
 			$sourceId = $this->getFileNameFromPath($filePath, true);
@@ -57,7 +57,7 @@ class BxData
 		return $this->addSourceFile($filePath, $sourceId, $container, 'item_data_file', 'CSV', $params, $validate);
 	}
 	
-	public function addCSVCustomerFile($filePath, $itemIdColumn, $encoding = 'UTF-8', $delimiter = ',', $enclosure = '&quot;', $escape = "\\", $lineSeparator = "\n", $sourceId = null, $container = 'customers', $validate=true) {
+	public function addCSVCustomerFile($filePath, $itemIdColumn, $encoding = 'UTF-8', $delimiter = ',', $enclosure = "\&", $escape = "\\\\", $lineSeparator = "\\n", $sourceId = null, $container = 'customers', $validate=true) {
 		$params = array('itemIdColumn'=>$itemIdColumn, 'encoding'=>$encoding, 'delimiter'=>$delimiter, 'enclosure'=>$enclosure, 'escape'=>$escape, 'lineSeparator'=>$lineSeparator);
 		if($sourceId == null) {
 			$sourceId = $this->getFileNameFromPath($filePath, true);
@@ -65,12 +65,12 @@ class BxData
 		return $this->addSourceFile($filePath, $sourceId, $container, 'item_data_file', 'CSV', $params, $validate);
 	}
 	
-	public function addCategoryFile($filePath, $categoryIdColumn, $parentIdColumn, $categoryLabelColumns, $encoding = 'UTF-8', $delimiter = ',', $enclosure = '&quot;', $escape = "\\", $lineSeparator = "\n", $sourceId = 'resource_categories', $container = 'products', $validate=true) {
+	public function addCategoryFile($filePath, $categoryIdColumn, $parentIdColumn, $categoryLabelColumns, $encoding = 'UTF-8', $delimiter = ',', $enclosure = "\&", $escape = "\\\\", $lineSeparator = "\\n", $sourceId = 'resource_categories', $container = 'products', $validate=true) {
 		$params = array('referenceIdColumn'=>$categoryIdColumn, 'parentIdColumn'=>$parentIdColumn, 'labelColumns'=>$categoryLabelColumns, 'encoding'=>$encoding, 'delimiter'=>$delimiter, 'enclosure'=>$enclosure, 'escape'=>$escape, 'lineSeparator'=>$lineSeparator);
 		return $this->addSourceFile($filePath, $sourceId, $container, 'hierarchical', 'CSV', $params, $validate);
 	}
 	
-	public function addResourceFile($filePath, $categoryIdColumn, $labelColumns, $encoding = 'UTF-8', $delimiter = ',', $enclosure = '&quot;', $escape = "\\", $lineSeparator = "\n", $sourceId = null, $container = 'products', $validate=true) {
+	public function addResourceFile($filePath, $categoryIdColumn, $labelColumns, $encoding = 'UTF-8', $delimiter = ',', $enclosure = "\&", $escape = "\\\\", $lineSeparator = "\\n", $sourceId = null, $container = 'products', $validate=true) {
 		$params = array('referenceIdColumn'=>$categoryIdColumn, 'labelColumns'=>$labelColumns, 'encoding'=>$encoding, 'delimiter'=>$delimiter, 'enclosure'=>$enclosure, 'escape'=>$escape, 'lineSeparator'=>$lineSeparator);
 		if($sourceId == null) {
 			$sourceId = 'resource_' . $this->getFileNameFromPath($filePath, true);
@@ -80,7 +80,7 @@ class BxData
 	
 	
 	
-	public function setCSVTransactionFile($filePath, $orderIdColumn, $productIdColumn, $customerIdColumn, $orderDateIdColumn, $totalOrderValueColumn, $productListPriceColumn, $productDiscountedPriceColumn, $productIdField='bx_item_id', $customerIdField='bx_customer_id', $productsContainer = 'products', $customersContainer = 'customers', $format = 'CSV', $encoding = 'UTF-8', $delimiter = ',', $enclosure = '&quot;', $escape = "\\", $lineSeparator = "\n",$container = 'transactions', $sourceId = 'transactions', $validate=true) {
+	public function setCSVTransactionFile($filePath, $orderIdColumn, $productIdColumn, $customerIdColumn, $orderDateIdColumn, $totalOrderValueColumn, $productListPriceColumn, $productDiscountedPriceColumn, $productIdField='bx_item_id', $customerIdField='bx_customer_id', $productsContainer = 'products', $customersContainer = 'customers', $format = 'CSV', $encoding = 'UTF-8', $delimiter = ',', $enclosure = "\&", $escape = "\\\\", $lineSeparator = "\\n",$container = 'transactions', $sourceId = 'transactions', $validate=true) {
 		
 		$params = array('encoding'=>$encoding, 'delimiter'=>$delimiter, 'enclosure'=>$enclosure, 'escape'=>$escape, 'lineSeparator'=>$lineSeparator);
 		
@@ -281,6 +281,7 @@ class BxData
 								'encoding'=>'UTF-8', 
 								'delimiter'=>',', 
 								'enclosure'=>'"', 
+								'escape'=>'\\\\', 
 								'lineSeparator'=>"\\n"
 							);
 				
@@ -352,7 +353,7 @@ class BxData
 						$property->addAttribute('type', $fieldValues['type']);
 						
 						$transform = $property->addChild('transform');				
-						$logic = $property->addChild('logic');	
+						$logic = $transform->addChild('logic');	
 						$logic->addAttribute('source', $sourceId);
 						$referenceSourceKey = isset($fieldValues['referenceSourceKey']) ? $fieldValues['referenceSourceKey'] : null;
 						$logicType = $referenceSourceKey == null ? 'direct' : 'reference';
@@ -385,8 +386,10 @@ class BxData
 				}
 			}
 		}
-	
-		return $xml->asXML();
+		
+		$dom = dom_import_simplexml($xml)->ownerDocument;
+		$dom->formatOutput = true;
+		return $dom->saveXML();
 	}
 
     protected function callAPI($fields, $url, $temporaryFilePath=null)
