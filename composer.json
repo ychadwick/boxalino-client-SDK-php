@@ -1,0 +1,18 @@
+{
+  "name": "ychadwick/boxalino-client-SDK-php",
+  "license": "MIT",
+  "type": "library",
+  "autoload": {
+    "psr-4": { "Thrift\\": "lib/Thrift" },
+    "psr-0": {"com\\boxalino\\p13n": "lib", "com\\boxalino\\bxclient\\v1": "lib"}
+  },
+  "require": {
+    "php": ">=5.3.9"
+  },
+  "config": {
+    "bin-dir": "bin",
+    "platform": {
+      "php": "5.3.9"
+    }
+  }
+}
