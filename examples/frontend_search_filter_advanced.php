@@ -28,13 +28,13 @@ try {
 	$queryText = "women"; // a search query
 	$hitCount = 10; //a maximum number of search result to return in one page
 	$filterField = "id"; //the field to consider in the filter
-	$filterValues = array("41", "1940"); //the field to consider any of the values should match (or not match)
+	$filterValues = array("41", "1941"); //the field to consider any of the values should match (or not match)
 	$filterNegative = true; //false by default, should the filter match the values or not?
 	$filterField2 = "products_color"; //the field to consider in the filter
 	$filterValues2 = array("Yellow"); //the field to consider any of the values should match (or not match)
 	$filterNegative2 = false; //false by default, should the filter match the values or not?
 	$orFilters = true; //the two filters are either or (only one of them needs to be correct
-	$fieldNames = array("products_color");
+	$fieldNames = array("products_color"); //IMPORTANT: you need to put "products_" as a prefix to your field name except for standard fields: "title", "body", "discountedPrice", "price"
 
 	//create search request
 	$bxRequest = new BxSearchRequest($language, $queryText, $hitCount);

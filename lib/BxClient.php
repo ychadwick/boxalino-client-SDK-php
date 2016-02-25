@@ -226,7 +226,16 @@ class BxClient
 			$parts = explode('choice not found', $e->getMessage());
 			$pieces = explode('	at ', $parts[1]);
 			$choiceId = str_replace(':', '', trim($pieces[0]));
-			throw new \Exception("Configuration not live on account " . $this->getAccount() . ": choice $choiceId doesn't exist");
+			throw new \Exception("Configuration not live on account " . $this->getAccount() . ": choice $choiceId doesn't exist. NB: If you get a message indicating that the choice doesn't exist, this probably means that your choice configuraiton has not been loaded yet. It will happen automatically within 24 hours after your account's creation, but you can force it by calling (call it only once, not every time) \$bxData->publishChoices(); like in the example backend_data_init.php");
+		}
+		if(strpos($e->getMessage(), 'Solr returned status 404') !== false) {
+			throw new \Exception("Data not live on account " . $this->getAccount() . ": index returns status 404. Please publish your data first, like in example backend_data_basic.php.");
+		}
+		if(strpos($e->getMessage(), 'undefined field ') !== false) {
+			$parts = explode('undefined field ', $e->getMessage());
+			$pieces = explode('	at ', $parts[1]);
+			$field = str_replace(':', '', trim($pieces[0]));
+			throw new \Exception("You request in your filter or facets a non-existing field of your account " . $this->getAccount() . ": field $field doesn't exist.");
 		}
 		throw $e;
 	}

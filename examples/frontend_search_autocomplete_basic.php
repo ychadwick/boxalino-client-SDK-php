@@ -40,6 +40,10 @@ try {
 		echo "$suggestion<br>";
 	}
 	
+	if(sizeof($bxAutocompleteResponse->getTextualSuggestions()) == 0) {
+		echo "There are no autocomplete textual suggestions. This might be normal, but it also might mean that the first execution of the autocomplete index preparation was not done and published yet. Please refer to the example backend_data_init and make sure you have done the following steps at least once: 1) publish your data 2) run the prepareAutocomplete case 3) publish your data again";
+	}
+	
 } catch(\Exception $e) {
 	
 	//be careful not to print the error message on your publish web-site as sensitive information like credentials might be indicated for debug purposes

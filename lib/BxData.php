@@ -9,6 +9,8 @@ class BxData
     const URL_PUBLISH_CONFIGURATION_CHANGES = '/frontend/dbmind/en/dbmind/api/configuration/publish/owner';
 	const URL_ZIP = '/frontend/dbmind/en/dbmind/api/data/push';
 	
+	const URL_EXECUTE_TASK = '/frontend/dbmind/en/dbmind/files/task/execute';
+	
 	private $bxClient;
 	private $languages;
 	private $isDev;
@@ -585,4 +587,30 @@ class BxData
         } catch(\Exception $e) {}
         return "@$filename;type=$type";
     }
+	
+	public function getTaskExecuteUrl($taskName) {
+		return $this->host . self::URL_EXECUTE_TASK . '?iframeAccount=' . $this->bxClient->getAccount() . '&task_process=' . $taskName;
+	}
+	
+	public function publishChoices($isTest = false, $taskName="generate_optimization") {
+		
+		if($this->isDev) {
+			$taskName .= '_dev';
+		}
+		if($isTest) {
+			$taskName .= '_test';
+		}
+        $url = $this->getTaskExecuteUrl($taskName);
+		file_get_contents($url);
+	}
+	
+	public function prepareCorpusIndex($taskName="corpus") {
+        $url = $this->getTaskExecuteUrl($taskName);
+		file_get_contents($url);
+	}
+	
+	public function prepareAutocompleteIndex($fields, $taskName="autocomplete") {
+        $url = $this->getTaskExecuteUrl($taskName);
+		file_get_contents($url);
+	}
 }

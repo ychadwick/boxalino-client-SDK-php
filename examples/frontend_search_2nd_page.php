@@ -22,9 +22,9 @@ $bxClient = new BxClient($account, $password, $domain);
 
 try {
 	$language = "en"; // a valid language code (e.g.: "en", "fr", "de", "it", ...)
-	$queryText = "women"; // a search query
-	$hitCount = 10; //a maximum number of search result to return in one page
-	$offset = 10; //the offset to start the page with (if = hitcount ==> page 2)
+	$queryText = "watch"; // a search query
+	$hitCount = 5; //a maximum number of search result to return in one page
+	$offset = 5; //the offset to start the page with (if = hitcount ==> page 2)
 	
 	//create search request
 	$bxRequest = new BxSearchRequest($language, $queryText, $hitCount);

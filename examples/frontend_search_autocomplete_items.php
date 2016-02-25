@@ -24,7 +24,7 @@ try {
 	$language = "en"; // a valid language code (e.g.: "en", "fr", "de", "it", ...)
 	$queryText = "whit"; // a search query to be completed
 	$textualSuggestionsHitCount = 10; //a maximum number of search textual suggestions to return in one page
-	$fieldNames = array('title'); //return the title for each item returned (globally and per textual suggestion)
+	$fieldNames = array('title'); //return the title for each item returned (globally and per textual suggestion) - IMPORTANT: you need to put "products_" as a prefix to your field name except for standard fields: "title", "body", "discountedPrice", "price"
 
 	//create search request
 	$bxRequest = new BxAutocompleteRequest($language, $queryText, $textualSuggestionsHitCount);

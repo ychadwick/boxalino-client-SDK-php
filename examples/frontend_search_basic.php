@@ -45,6 +45,7 @@ try {
 } catch(\Exception $e) {
 	
 	//be careful not to print the error message on your publish web-site as sensitive information like credentials might be indicated for debug purposes
-	echo $e->getMessage();
+	echo "Error: " . $e->getMessage() . "<br>";
+	
 	exit;
 }
