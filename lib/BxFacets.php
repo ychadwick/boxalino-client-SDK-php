@@ -216,7 +216,7 @@ class BxFacets
 		}
 		$facet = $this->getFacetByFieldName($fieldName);
 		if($facet != null) {
-			if($facet[1] == 'hierarchical') {
+			if($facet['type'] == 'hierarchical') {
 				$facetResponse = $this->getFacetResponse($fieldName);
 				$tree = $this->buildTree($facetResponse->values);
 				$tree = $this->getSelectedTreeNode($tree);
@@ -276,19 +276,22 @@ class BxFacets
 		}
 		$facet = $this->getFacetByFieldName($fieldName);
 		if($facet != null) {
-			if($facet[1] == 'hierarchical') {
+			if($facet['type'] == 'hierarchical') {
 				$facetResponse = $this->getFacetResponse($fieldName);
 				$tree = $this->buildTree($facetResponse->values);
 				$tree = $this->getSelectedTreeNode($tree);
 				$parts = explode('/', $tree['node']->stringValue);
 				return $parts[sizeof($parts)-1];
 			}
-			if($facet[1] == 'ranged') {
+			if($facet['type'] == 'ranged') {
 				if(isset($this->facets[$fieldName]['selectedValues'][0])) {
 					return $this->facets[$fieldName]['selectedValues'][0];
 				}
 			}
-			return $facet[2];
+			if(isset($facet['selectedValues'][0])) {
+				return $facet['selectedValues'][0];
+			}
+			return "";
 		}
 		return "";
 	}
@@ -311,7 +314,7 @@ class BxFacets
 	
 	public function getFacetLabel($fieldName) {
 		if(isset($this->facets[$fieldName])) {
-			return $this->facets[$fieldName][0];
+			return $this->facets[$fieldName]['label'];
 		}
 		return $fieldName;
 	}
@@ -433,4 +436,28 @@ class BxFacets
         }
         return;
     }
+
+	public function getParentId($fieldName, $id){
+		$hierarchy = array();
+
+		foreach ($this->facetResponse as $response) {
+			if($response->fieldName == $fieldName){
+				foreach($response->values as $item){
+					if($item->hierarchyId == $id){
+						$hierarchy = $item->hierarchy;
+						if(count($hierarchy) < 4) {
+							return 1;
+						}
+					}
+				}
+				foreach ($response->values as $item) {
+					if (count($item->hierarchy) == count($hierarchy) - 1) {
+						if ($item->hierarchy[count($hierarchy) - 2] === $hierarchy[count($hierarchy) - 2]) {
+							return $item->hierarchyId;
+						}
+					}
+				}
+			}
+		}
+	}
 }

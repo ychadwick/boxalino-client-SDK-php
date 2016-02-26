@@ -482,6 +482,18 @@ class BxData
 		return $this->callAPI($fields, $url);
 	}
 	
+	public function verifyCredentials() {
+		$fields = array(
+            'username' => $this->bxClient->getUsername(),
+            'password' => $this->bxClient->getPassword(),
+            'account' => $this->bxClient->getAccount(false),
+            'owner' => $this->owner
+        );
+		
+        $url = $this->host . self::URL_VERIFY_CREDENTIALS;
+		return $this->callAPI($fields, $url);
+	}
+	
 	public function getFileNameFromPath($filePath, $withoutExtension=false) {
 		$parts = explode('/', $filePath);
 		$file = $parts[sizeof($parts)-1];

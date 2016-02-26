@@ -14,7 +14,6 @@ class BxClient
 	private $p13n_username;
 	private $p13n_password;
 	private $domain;
-	private $language;
 	
 	private $autocompleteRequest = null;
 	private $autocompleteResponse = null;
@@ -24,7 +23,7 @@ class BxClient
 	
     const VISITOR_COOKIE_TIME = 31536000;
 
-	public function __construct($account, $password, $domain, $language=null, $isDev=false, $host=null, $port=null, $uri=null, $schema=null, $p13n_username=null, $p13n_password=null) {
+	public function __construct($account, $password, $domain, $isDev=false, $host=null, $port=null, $uri=null, $schema=null, $p13n_username=null, $p13n_password=null) {
 		$this->account = $account;
 		$this->password = $password;
 		$this->isDev = $isDev;
@@ -53,7 +52,6 @@ class BxClient
 			$this->p13n_password = "tkZ8EXfzeZc6SdXZntCU";
 		}
 		$this->domain = $domain;
-		$this->language = $language;
 	}
 	
 	public static function LOAD_CLASSES($libPath) {
@@ -255,6 +253,13 @@ class BxClient
 	
 	public function resetRequests() {
 		$this->chooseRequests = array();
+	}
+	
+	public function getRequest($index=0) {
+		if(sizeof($this->chooseRequests) <= $index) {
+			return null;
+		}
+		return $this->chooseRequests[$index];
 	}
 	
 	public function getThriftChoiceRequest() {
