@@ -235,6 +235,9 @@ class BxClient
 			$field = str_replace(':', '', trim($pieces[0]));
 			throw new \Exception("You request in your filter or facets a non-existing field of your account " . $this->getAccount() . ": field $field doesn't exist.");
 		}
+		if(strpos($e->getMessage(), 'All choice variants are excluded') !== false) {
+			throw new \Exception("You have an invalid configuration for with a choice defined, but having no defined strategies. This is a quite unusual case, please contact support@boxalino.com to get support.");
+		}
 		throw $e;
 	}
 	
