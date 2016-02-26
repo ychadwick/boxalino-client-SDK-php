@@ -15,9 +15,6 @@ class BxClient
 	private $p13n_password;
 	private $domain;
 	
-	private $autocompleteRequest = null;
-	private $autocompleteResponse = null;
-	
 	private $autocompleteRequests = null;
 	private $autocompleteResponses = null;
 	
@@ -296,8 +293,7 @@ class BxClient
 	}
 	
 	public function setAutocompleteRequest($request) {
-		$this->enhanceAutoCompleterequest($request);
-		$this->autocompleteRequest = $request;
+		$this->setAutocompleteRequests(array($request));
 	}
 	
 	public function setAutocompleteRequests($requests) {
@@ -322,22 +318,6 @@ class BxClient
 	public function autocomplete()
 	{
 		list($sessionid, $profileid) = $this->getSessionAndProfile();
-		
-		$autocompleteRequest = $this->autocompleteRequest->getAutocompleteThriftRequest($profileid, $this->getUserRecord());
-		
-		$this->autocompleteResponse = new BxAutocompleteResponse($this->p13nautocomplete($autocompleteRequest), $this->autocompleteRequest);
-
-	}
-		
-	public function getAutocompleteResponse() {
-		if(!$this->autocompleteResponse) {
-			$this->autocomplete();
-		}
-		return $this->autocompleteResponse;
-	}
-		
-	public function autocompleteAll() {
-		list($sessionid, $profileid) = $this->getSessionAndProfile();
 		$userRecord = $this->getUserRecord();
 		$p13nrequests = array_map(function($request) use(&$profileid, &$userRecord) {
 			return $request->getAutocompleteThriftRequest($profileid, $userRecord);
@@ -347,6 +327,15 @@ class BxClient
 			$request = $this->autocompleteRequests[++$i];
 			return new BxAutocompleteResponse($response, $request);
 		}, $this->p13nautocompleteAll($p13nrequests));
+
+	}
+		
+	public function getAutocompleteResponse() {
+		$responses = $this->getAutocompleteResponses();
+		if(isset($responses[0])) {
+			return $responses[0];
+		}
+		return null;
 	}
 	
 	private function p13nautocompleteAll($requests) {
@@ -361,7 +350,7 @@ class BxClient
 			
 	public function getAutocompleteResponses() {
 		if (!$this->autocompleteResponses) {
-			$this->autocompleteAll();
+			$this->autocomplete();
 		}
 		return $this->autocompleteResponses;
 	}
