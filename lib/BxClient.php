@@ -44,10 +44,6 @@ class BxClient
 	 * @var
 	 */
 	protected $domain;
-	/**
-	 * @var
-	 */
-	protected $language;
 
 	/**
 	 * @var null
