@@ -48,11 +48,11 @@ class BxClient
 	/**
 	 * @var null
 	 */
-	protected $autocompleteRequest = null;
+	protected $autocompleteRequests = null;
 	/**
 	 * @var null
 	 */
-	protected $autocompleteResponse = null;
+	protected $autocompleteResponses = null;
 
 	/**
 	 * @var array
