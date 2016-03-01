@@ -4,25 +4,71 @@ namespace com\boxalino\bxclient\v1;
 
 class BxClient
 {
-	private $account;
-	private $password;
-	private $isDev;
-	private $host;
-	private $port;
-	private $uri;
-	private $schema;
-	private $p13n_username;
-	private $p13n_password;
-	private $domain;
-	private $language;
-	
-	private $autocompleteRequest = null;
-	private $autocompleteResponse = null;
-	
-	private $chooseRequests = array();
-	private $chooseResponses = null;
-	
-    const VISITOR_COOKIE_TIME = 31536000;
+	/**
+	 * @var
+	 */
+	protected $account;
+	/**
+	 * @var
+	 */
+	protected $password;
+	/**
+	 * @var
+	 */
+	protected $isDev;
+	/**
+	 * @var
+	 */
+	protected $host;
+	/**
+	 * @var
+	 */
+	protected $port;
+	/**
+	 * @var
+	 */
+	protected $uri;
+	/**
+	 * @var
+	 */
+	protected $schema;
+	/**
+	 * @var
+	 */
+	protected $p13n_username;
+	/**
+	 * @var
+	 */
+	protected $p13n_password;
+	/**
+	 * @var
+	 */
+	protected $domain;
+	/**
+	 * @var
+	 */
+	protected $language;
+
+	/**
+	 * @var null
+	 */
+	protected $autocompleteRequest = null;
+	/**
+	 * @var null
+	 */
+	protected $autocompleteResponse = null;
+
+	/**
+	 * @var array
+	 */
+	protected $chooseRequests = array();
+	/**
+	 * @var null
+	 */
+	protected $chooseResponses = null;
+
+
+	const VISITOR_COOKIE_TIME = 31536000;
 
 	public function __construct($account, $password, $domain, $language=null, $isDev=false, $host=null, $port=null, $uri=null, $schema=null, $p13n_username=null, $p13n_password=null) {
 		$this->account = $account;
@@ -92,7 +138,7 @@ class BxClient
 		return $this->password;
 	}
 	
-	private function getSessionAndProfile() {
+	protected function getSessionAndProfile() {
 		if (empty($_COOKIE['cems'])) {
             $sessionid = session_id();
             if (empty($sessionid)) {
@@ -127,13 +173,13 @@ class BxClient
 		return array($sessionid, $profileid);
 	}
 	
-	private function getUserRecord() {
+	protected function getUserRecord() {
 		$userRecord = new \com\boxalino\p13n\api\thrift\UserRecord();
         $userRecord->username = $this->getAccount();
         return $userRecord;
 	}
 	
-    private function getP13n($sendTimeout=120000, $recvTimeout=120000, $useCurlIfAvailable=true)
+    protected function getP13n($sendTimeout=120000, $recvTimeout=120000, $useCurlIfAvailable=true)
     {
         $transport = new \Thrift\Transport\TSocket($this->host, $this->port);
 		$transport->setSendTimeout($sendTimeout);
@@ -215,7 +261,7 @@ class BxClient
         return $requestContext;
     }
 	
-	private function throwCorrectP13nException($e) {
+	protected function throwCorrectP13nException($e) {
 		if(strpos($e->getMessage(), 'Could not connect ') !== false) {
 			throw new \Exception('The connection to our server failed even before checking your credentials. This might be typically caused by 2 possible things: wrong values in host, port, schema or uri (typical value should be host=cdn.bx-cloud.com, port=443, uri =/p13n.web/p13n and schema=https, your values are : host=' . $this->host . ', port=' . $this->port . ', schema=' . $this->schema . ', uri=' . $this->uri . '). Another possibility, is that your server environment has a problem with ssl certificate (peer certificate cannot be authenticated with given ca certificates), which you can either fix, or avoid the problem by adding the line "curl_setopt(self::$curlHandle, CURLOPT_SSL_VERIFYPEER, false);" in the file "lib\Thrift\Transport\P13nTCurlClient" after the call to curl_init in the function flush. Full error message=' . $e->getMessage());
 		}
@@ -240,7 +286,7 @@ class BxClient
 		throw $e;
 	}
 	
-	private function p13nchoose($choiceRequest) {
+	protected function p13nchoose($choiceRequest) {
 		try {
 			return $this->getP13n()->choose($choiceRequest);
 		} catch(\Exception $e) {
@@ -292,7 +338,7 @@ class BxClient
 		$this->autocompleteRequest = $request;
 	}
 	
-	private function p13nautocomplete($autocompleteRequest) {
+	protected function p13nautocomplete($autocompleteRequest) {
 		try {
 			return $this->getP13n()->autocomplete($autocompleteRequest);
 		} catch(\Exception $e) {
