@@ -5,3 +5,4 @@
 .settings
 /nbproject/private/
 gen-java
+.DS_Store
