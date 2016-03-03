@@ -138,6 +138,9 @@ class BxFacets
 		if(!isset($this->facets['category_id'])){
 			return $tree;
 		}
+		if(!$tree['node']){
+			return null;
+		}
 		$parts = explode('/', $tree['node']->stringValue);
 		if($parts[0] == $this->facets['category_id']['selectedValues'][0]) {
 			return $tree;
