@@ -25,7 +25,7 @@ try {
 	$queryText = "women"; // a search query
 	$hitCount = 10; //a maximum number of search result to return in one page
 	
-	$fieldNames = array("products_color");//IMPORTANT: you need to put "products_" as a prefix to your field name except for standard fields: "title", "body", "discountedPrice", "price"
+	$fieldNames = array("products_color");//IMPORTANT: you need to put "products_" as a prefix to your field name except for standard fields: "title", "body", "discountedPrice", "standardPrice"
 	
 	//create search request
 	$bxRequest = new BxSearchRequest($language, $queryText, $hitCount);

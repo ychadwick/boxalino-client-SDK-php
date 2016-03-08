@@ -24,7 +24,7 @@ try {
 	$language = "de"; // a valid language code (e.g.: "en", "fr", "de", "it", ...)
 	$queryTexts = array("whit", "yello"); // a search query to be completed
 	$textualSuggestionsHitCount = 10; //a maximum number of search textual suggestions to return in one page
-	$fieldNames = array('title'); //return the title for each item returned (globally and per textual suggestion) - IMPORTANT: you need to put "products_" as a prefix to your field name except for standard fields: "title", "body", "discountedPrice", "price"
+	$fieldNames = array('title'); //return the title for each item returned (globally and per textual suggestion) - IMPORTANT: you need to put "products_" as a prefix to your field name except for standard fields: "title", "body", "discountedPrice", "standardPrice"
 
 	$bxRequests = [];
 	foreach ($queryTexts as $queryText) {
