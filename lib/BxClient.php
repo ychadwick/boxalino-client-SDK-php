@@ -22,6 +22,8 @@ class BxClient
 	private $chooseResponses = null;
 	
 	const VISITOR_COOKIE_TIME = 31536000;
+	
+	private $requestContextParameters = array();
 
 	public function __construct($account, $password, $domain, $isDev=false, $host=null, $port=null, $uri=null, $schema=null, $p13n_username=null, $p13n_password=null) {
 		$this->account = $account;
@@ -190,6 +192,17 @@ class BxClient
 		return $protocol . '://' . $hostname . $requesturi;
 	}
 	
+	public function addRequestContextParameter($name, $values) {
+		if(!is_array($values)) {
+			$values = array($values);
+		}
+		$this->requestContextParameters[$name] = $values;
+	}
+	
+	public function resetRequestContextParameter() {
+		$this->requestContextParameters = array();
+	}
+	
 	protected function getRequestContext()
 	{
 		list($sessionid, $profileid) = $this->getSessionAndProfile();
@@ -202,6 +215,9 @@ class BxClient
 			'User-Referer'   => array(@$_SERVER['HTTP_REFERER']),
 			'User-URL'	   => array($this->getCurrentURL())
 		);
+		foreach($this->requestContextParameters as $k => $v) {
+			$requestContext->parameters[$k] = $v;
+		}
 
 		if (isset($_REQUEST['p13nRequestContext']) && is_array($_REQUEST['p13nRequestContext'])) {
 			$requestContext->parameters = array_merge(
