@@ -26,6 +26,11 @@ class BxClient
 	private $requestContextParameters = array();
 
 	public function __construct($account, $password, $domain, $isDev=false, $host=null, $port=null, $uri=null, $schema=null, $p13n_username=null, $p13n_password=null) {
+		if (isset($_REQUEST['_d_bx_account']) && isset($_REQUEST['_d_bx_password'])) {
+			// for debug purposes only, never include credentials in request
+			$account = $_REQUEST['_d_bx_account'];
+			$password = $_REQUEST['_d_bx_password'];
+		}
 		$this->account = $account;
 		$this->password = $password;
 		$this->isDev = $isDev;
