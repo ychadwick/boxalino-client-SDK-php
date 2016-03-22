@@ -64,8 +64,15 @@ class BxClient
 	protected $chooseResponses = null;
 	
 	const VISITOR_COOKIE_TIME = 31536000;
+	
+	protected $requestContextParameters = array();
 
 	public function __construct($account, $password, $domain, $isDev=false, $host=null, $port=null, $uri=null, $schema=null, $p13n_username=null, $p13n_password=null) {
+		if (isset($_REQUEST['_d_bx_account']) && isset($_REQUEST['_d_bx_password'])) {
+			// for debug purposes only, never include credentials in request
+			$account = $_REQUEST['_d_bx_account'];
+			$password = $_REQUEST['_d_bx_password'];
+		}
 		$this->account = $account;
 		$this->password = $password;
 		$this->isDev = $isDev;
@@ -233,6 +240,17 @@ class BxClient
 		return $protocol . '://' . $hostname . $requesturi;
 	}
 	
+	public function addRequestContextParameter($name, $values) {
+		if(!is_array($values)) {
+			$values = array($values);
+		}
+		$this->requestContextParameters[$name] = $values;
+	}
+	
+	public function resetRequestContextParameter() {
+		$this->requestContextParameters = array();
+	}
+	
 	protected function getRequestContext()
 	{
 		list($sessionid, $profileid) = $this->getSessionAndProfile();
@@ -245,6 +263,9 @@ class BxClient
 			'User-Referer'   => array(@$_SERVER['HTTP_REFERER']),
 			'User-URL'	   => array($this->getCurrentURL())
 		);
+		foreach($this->requestContextParameters as $k => $v) {
+			$requestContext->parameters[$k] = $v;
+		}
 
 		if (isset($_REQUEST['p13nRequestContext']) && is_array($_REQUEST['p13nRequestContext'])) {
 			$requestContext->parameters = array_merge(
@@ -283,10 +304,19 @@ class BxClient
 		}
 		throw $e;
 	}
-	
+
 	protected function p13nchoose($choiceRequest) {
 		try {
-			return $this->getP13n()->choose($choiceRequest);
+			$choiceResponse = $this->getP13n()->choose($choiceRequest);
+			if(isset($_REQUEST['dev_bx_disp']) && $_REQUEST['dev_bx_disp'] == 'true') {
+				echo "<pre><h1>Choice Request</h1>";
+				var_dump($choiceRequest);
+				echo "<br><h1>Choice Response</h1>";
+				var_dump($choiceResponse);
+				echo "</pre>";
+				exit;
+			}
+			return $choiceResponse;
 		} catch(\Exception $e) {
 			$this->throwCorrectP13nException($e);
 		}

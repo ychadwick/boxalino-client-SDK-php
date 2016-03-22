@@ -34,7 +34,7 @@ try {
 	$filterValues2 = array("Yellow"); //the field to consider any of the values should match (or not match)
 	$filterNegative2 = false; //false by default, should the filter match the values or not?
 	$orFilters = true; //the two filters are either or (only one of them needs to be correct
-	$fieldNames = array("products_color"); //IMPORTANT: you need to put "products_" as a prefix to your field name except for standard fields: "title", "body", "discountedPrice", "price"
+	$fieldNames = array("products_color"); //IMPORTANT: you need to put "products_" as a prefix to your field name except for standard fields: "title", "body", "discountedPrice", "standardPrice"
 
 	//create search request
 	$bxRequest = new BxSearchRequest($language, $queryText, $hitCount);

@@ -26,7 +26,7 @@ try {
 	$language = "en"; // a valid language code (e.g.: "en", "fr", "de", "it", ...)
 	$queryText = "women"; // a search query
 	$hitCount = 10; //a maximum number of search result to return in one page
-	$facetField = "products_color"; //the field to consider in the filter - IMPORTANT: you need to put "products_" as a prefix to your field name except for standard fields: "title", "body", "discountedPrice", "price"
+	$facetField = "products_color"; //the field to consider in the filter - IMPORTANT: you need to put "products_" as a prefix to your field name except for standard fields: "title", "body", "discountedPrice", "standardPrice"
 	$selectedValue = isset($_REQUEST['bx_' . $facetField]) ? $_REQUEST['bx_' . $facetField] : null;
 
 	//create search request

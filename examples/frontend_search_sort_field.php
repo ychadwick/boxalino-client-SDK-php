@@ -29,7 +29,7 @@ try {
 	$language = "en"; // a valid language code (e.g.: "en", "fr", "de", "it", ...)
 	$queryText = "women"; // a search query
 	$hitCount = 10; //a maximum number of search result to return in one page
-	$sortField = "title"; //sort the search results by this field - IMPORTANT: you need to put "products_" as a prefix to your field name except for standard fields: "title", "body", "discountedPrice", "price"
+	$sortField = "title"; //sort the search results by this field - IMPORTANT: you need to put "products_" as a prefix to your field name except for standard fields: "title", "body", "discountedPrice", "standardPrice"
 	$sortDesc = true; //sort in an ascending / descending way
 
 	//create search request

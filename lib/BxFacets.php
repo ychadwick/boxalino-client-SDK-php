@@ -34,14 +34,14 @@ class BxFacets
 	
 	public function addPriceRangeFacet($selectedValue=null, $order=2, $label='Price', $fieldName = 'discountedPrice') {
 		$this->priceFieldName = $fieldName;
-		$this->addRangedFacet($fieldName, $selectedValue, $label, $order);
+		$this->addRangedFacet($fieldName, $selectedValue, $label, $order, true);
 	}
 	
-	public function addRangedFacet($fieldName, $selectedValue=null, $label=null, $order=2) {
-		$this->addFacet($fieldName, $selectedValue, 'ranged', $label, $order);
+	public function addRangedFacet($fieldName, $selectedValue=null, $label=null, $order=2, $boundsOnly=false) {
+		$this->addFacet($fieldName, $selectedValue, 'ranged', $label, $order, $boundsOnly);
 	}
 
-	public function addFacet($fieldName, $selectedValue=null, $type='string', $label=null, $order=2) {
+	public function addFacet($fieldName, $selectedValue=null, $type='string', $label=null, $order=2, $boundsOnly=false) {
 		$selectedValues = array();
 		if($selectedValue) {
 			if(!is_array($selectedValue)){
@@ -51,7 +51,7 @@ class BxFacets
 			}
 
 		}
-		$this->facets[$fieldName] = array('label'=>$label, 'type'=>$type, 'order'=>$order, 'selectedValues'=>$selectedValues);
+		$this->facets[$fieldName] = array('label'=>$label, 'type'=>$type, 'order'=>$order, 'selectedValues'=>$selectedValues, 'boundsOnly'=>$boundsOnly);
 	}
 	
 	public function setParameterPrefix($parameterPrefix) {
@@ -142,6 +142,9 @@ class BxFacets
 	public function getSelectedTreeNode($tree) {
 		if(!isset($this->facets['category_id'])){
 			return $tree;
+		}
+		if(!$tree['node']){
+			return null;
 		}
 		$parts = explode('/', $tree['node']->stringValue);
 		if($parts[0] == $this->facets['category_id']['selectedValues'][0]) {
@@ -409,6 +412,7 @@ class BxFacets
 			$facetRequest->fieldName = $fieldName;
 			$facetRequest->numerical = $type == 'ranged' ? true : $type == 'numerical' ? true : false;
 			$facetRequest->range = $type == 'ranged' ? true : false;
+			$facetRequest->boundsOnly = $facet['boundsOnly'];
 			$facetRequest->selectedValues = $this->facetSelectedValue($fieldName, $type);
 			$facetRequest->sortOrder = isset($order) && $order == 1 ? 1 : 2;
 			$thriftFacets[] = $facetRequest;

@@ -1,7 +1,7 @@
 <?php
 
 /**
-* In this example, we make a simple search query, defined additional fields to be returned for each reserult, get the search results and print their field values
+* In this example, we make a simple search query, and pass request parameters to overwrite the standard geoIP-latitude and geoIP-longitude parameters. The example doesn't do anything with them, but this is a relevant example as this is exactly what you need to do if you want to use alternative position than the geo-ip position in a case of geo-positioned search or recommendations.
 */
 
 //include the Boxalino Client SDK php files
@@ -25,13 +25,15 @@ try {
 	$queryText = "women"; // a search query
 	$hitCount = 10; //a maximum number of search result to return in one page
 	
-	$fieldNames = array("products_color");//IMPORTANT: you need to put "products_" as a prefix to your field name except for standard fields: "title", "body", "discountedPrice", "standardPrice"
+	$requestParameters = array("geoIP-latitude" => array("47.36"), "geoIP-longitude" => array("6.1517993"));
 	
 	//create search request
 	$bxRequest = new BxSearchRequest($language, $queryText, $hitCount);
 	
 	//set the fields to be returned for each item in the response
-	$bxRequest->setReturnFields($fieldNames);
+	foreach($requestParameters as $k => $v) {
+		$bxClient->addRequestContextParameter($k, $v);
+	}
 	
 	//add the request
 	$bxClient->addRequest($bxRequest);
@@ -39,12 +41,12 @@ try {
 	//make the query to Boxalino server and get back the response for all requests
 	$bxResponse = $bxClient->getResponse();
 	
+	//indicate the search made with the number of results found
+	echo "Results for query \"" . $queryText . "\" (" . $bxResponse->getTotalHitCount() . "):<br><br>";
+	
 	//loop on the search response hit ids and print them
-	foreach($bxResponse->getHitFieldValues($fieldNames) as $id => $fieldValueMap) {
-		echo "<h3>$id</h3>";
-		foreach($fieldValueMap as $fieldName => $fieldValues) {
-			echo "$fieldName: " . implode(',', $fieldValues) . "<br>";
-		}
+	foreach($bxResponse->getHitIds() as $i => $id) {
+		echo "$i: returned id $id<br>";
 	}
 	
 } catch(\Exception $e) {
