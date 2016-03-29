@@ -235,6 +235,10 @@ class BxData
 		}
 	}
 	
+	public function setFieldIsMultiValued($sourceKey, $fieldName, $multiValued = true) {
+		$this->addFieldParameter($sourceKey, $fieldName, 'multiValued', $multiValued ? 'true' : 'false');
+	}
+	
 	public function addFieldParameter($sourceKey, $fieldName, $parameterName, $parameterValue) {
 		list($container, $sourceId) = $this->decodeSourceKey($sourceKey);
 		if(!isset($this->sources[$container][$sourceId]['fields'][$fieldName])) {
