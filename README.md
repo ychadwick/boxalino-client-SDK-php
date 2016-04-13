@@ -101,6 +101,9 @@ In this example, we make a simple search autocomplete query, get the textual sea
 ###### frontend search autocomplete items bundled:
 In this example, we make several search autocomplete queries, and for each get the textual search suggestions and the item suggestions for each textual suggestion and globally.
 
+###### frontend search autocomplete property:
+In this example, we show how to get autocomplete response on a property (to see what property value start with the query as prefix and how many search result they return if searched)
+
 ## Recommendations examples
 
 provided in a good order to learn them step by step!
