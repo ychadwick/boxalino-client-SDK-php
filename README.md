@@ -1,5 +1,7 @@
 # boxalino Client SDK in PHP
 
+## This is a fork of the boxalino/baxalino-client-SDK-php, to enable the SDK to be installed via compser and to allow the Client to be extended, and overriden.
+
 The Boxalino Client SDK provides a simple and efficient usage of Boxalino Search & Recommendations services (based on the p13n Thrift client libraries as separately provided in respective git-hub repositories) and to Boxalino Data Intelligence especially for Data Synchronization (define the structure of your data, push and publish your data structure configuration, push data in dev/prod and full/delta to Boxalino).
 
 The Boxalino Client SDK are particularly interesting for integrators of Boxalino technologies and provides the following advantages compare to using the underlying API directly.
